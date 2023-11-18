@@ -1,22 +1,28 @@
 import React, { useState } from 'react';
-import Login from './components/Login';
+import Login from './components/Login'; // Assuming you have a Login component
 import HomePage from './components/HomePage';
 
 function App() {
   const [user, setUser] = useState(null);
 
-  const handleLogin = (user) => {
-    setUser(user);
+  const handleLogout = () => {
+    setUser(null);
+    // You can also redirect to the login page or handle the logged-out state here
   };
 
   return (
     <div className="App">
-      {!user ? <Login onLogin={handleLogin} /> : <HomePage user={user} />}
+      {user ? (
+        <HomePage user={user} onLogout={handleLogout} />
+      ) : (
+        <Login onLogin={setUser} />
+      )}
     </div>
   );
 }
 
 export default App;
+
 
 
 

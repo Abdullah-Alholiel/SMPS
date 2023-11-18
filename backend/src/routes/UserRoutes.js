@@ -1,36 +1,14 @@
 const express = require('express');
-const User = require('../models/User');
+const userController = require('../controllers/userController');
+const auth = require('../middleware/auth');
 const router = express.Router();
 
-// Signup route
-router.post('/users/signup', async (req, res) => {
-    try {
-        const user = new User(req.body);
-        await user.save();
-        const token = await user.generateAuthToken();
-        res.status(201).send({ user, token });
-    } catch (error) {
-        res.status(400).send(error);
-    }
-});
+router.post('/users/register', userController.register);
+router.post('/users/login', userController.login);
 
-// Login route
-router.post('/users/login', async (req, res) => {
-    try {
-        const { username, password } = req.body;
-        const user = await User.findOne({ username });
-        if (!user) {
-            return res.status(401).send({ error: 'Login failed! Check authentication credentials' });
-        }
-        const isPasswordMatch = await bcrypt.compare(password, user.password);
-        if (!isPasswordMatch) {
-            return res.status(401).send({ error: 'Login failed! Check authentication credentials' });
-        }
-        const token = await user.generateAuthToken();
-        res.send({ user, token });
-    } catch (error) {
-        res.status(400).send(error);
-    }
-});
+// Use auth middleware for routes that require authentication
+router.post('/users/logout', auth, userController.logout);
+
+// Add more routes and link them to controller functions as needed
 
 module.exports = router;
