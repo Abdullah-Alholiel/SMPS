@@ -11,4 +11,4 @@ router.post('/users/logout', auth, userController.logout);
 
 // Add more routes and link them to controller functions as needed
 
-module.exports = router;
+module.exports = router;  

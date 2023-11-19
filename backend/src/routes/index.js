@@ -1,9 +1,20 @@
 const express = require('express');
-const router = express.Router();
 const userRoutes = require('./UserRoutes');
-// Import other route modules
+const parkingSlotRoutes = require('./Parkingslot');
+const ReservatiouRoutes = require('./ReservationRoutes');
+// const auth = require('../middleware/auth');
+
+const router = express.Router();
+
 
 router.use(userRoutes);
-// Use other route modules
+
+// router.use(auth);  
+// if needed for authentication
+
+router.use(parkingSlotRoutes);
+router.use(ReservatiouRoutes);
+
+
 
 module.exports = router;

@@ -33,7 +33,7 @@ exports.login = async (req, res) => {
     }
 };
 
-// Add more user-related functions as needed
+// logout
 exports.logout = async (req, res) => {
     try {
         req.user.tokens = req.user.tokens.filter((token) => {
