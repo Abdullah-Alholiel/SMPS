@@ -45,3 +45,43 @@ exports.logout = async (req, res) => {
         res.status(500).send({ error: 'Logout failed', details: error.message });
     }
 };
+
+
+// Update user
+exports.updateUser = async (req, res) => {
+    // Extracting the username and other update fields from the request body
+    const { username, email, password, phoneNumber } = req.body;
+
+    try {
+        // Validate email
+        if (email && !email.includes('@')) {
+            return res.status(400).send({ error: 'Invalid email format' });
+        }
+
+        // Validate phone number
+        if (phoneNumber && !phoneNumber.match(/^\d{10,}$/)) {
+            return res.status(400).send({ error: 'Phone number must be more than 10 digits' });
+        }
+
+        // Find the user with the given username
+        const user = await User.findOne({ username });
+
+        // Check if the user exists
+        if (!user) {
+            return res.status(404).send({ error: 'User not found' });
+        }
+
+        // Update the user's information
+        if (email) user.email = email;
+        if (phoneNumber) user.phoneNumber = phoneNumber;
+        if (password) user.password = await bcrypt.hash(password, 8);
+
+        // Save the user to the database
+        await user.save();
+
+        // Return the updated user
+        res.send({ message: 'User updated successfully', user });
+    } catch (error) {
+        res.status(500).send({ error: 'Update failed', details: error.message });
+    }
+};

@@ -6,9 +6,10 @@ const parkingSlotSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  isAvailable: {
-    type: Boolean,
-    default: true
+  status: {
+    type: String,
+    enum: ['available', 'reserved', 'occupied', 'unauthorized'],
+    default: 'available'
   },
   distanceThreshold: {
     type: Number,
@@ -22,24 +23,12 @@ const parkingSlotSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User', // Reference to the User model
     default: null
+  },
+  lastUpdated: {
+    type: Date,
+    default: Date.now
   }
-}, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
-
-// Virtual field to determine if the slot is occupied
-parkingSlotSchema.virtual('isOccupied').get(function () {
-  return this.currentDistance < this.distanceThreshold && this.reservedBy;
-});
-
-// Virtual field to determine the status of the slot
-parkingSlotSchema.virtual('status').get(function () {
-  if (this.isOccupied) {
-    return 'occupied';
-  }
-  else if (this.reservedBy) {
-    return 'reserved';
-  }
-  return 'available';
-});
+}, { timestamps: true });
 
 const ParkingSlot = mongoose.model('ParkingSlot', parkingSlotSchema);
 

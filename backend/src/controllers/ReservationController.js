@@ -1,5 +1,5 @@
 const ParkingSlot = require('../models/ParkingSlot');
-const Reservation = require('../models/Reservation');
+const Reservation = require('../models/Reservations');
 const mongoose = require('mongoose');
 
 // Create a new reservation
@@ -141,6 +141,27 @@ exports.handleUnauthorizedParking = async (req, res) => {
         res.status(200).send({ message: 'Unauthorized parking handled', slot });
     } catch (error) {
         res.status(500).send({ error: 'Error handling unauthorized parking' });
+    }
+};
+
+
+
+// Function to show all reservations
+exports.showAllReservations = async (req, res) => {
+    try {
+        // Fetch all reservations from the database
+        const reservations = await Reservation.find({});
+
+        // Check if reservations exist
+        if (!reservations || reservations.length === 0) {
+            return res.status(404).send({ message: 'No reservations found' });
+        }
+
+        // Send the list of reservations in the response
+        res.status(200).send(reservations);
+    } catch (error) {
+        // Handle any errors that occur during the process
+        res.status(500).send({ error: 'Error fetching reservations', details: error.message });
     }
 };
 
