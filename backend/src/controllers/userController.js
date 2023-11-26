@@ -47,7 +47,7 @@ exports.logout = async (req, res) => {
 };
 
 
-// Update user
+// Update user needs to updated to take token in consideration
 exports.updateUser = async (req, res) => {
     // Extracting the username and other update fields from the request body
     const { username, email, password, phoneNumber } = req.body;
@@ -56,6 +56,11 @@ exports.updateUser = async (req, res) => {
         // Validate email
         if (email && !email.includes('@')) {
             return res.status(400).send({ error: 'Invalid email format' });
+        }
+
+        // Validate password
+        if (password && password.length < 3) {
+            return res.status(400).send({ error: 'Password must be at least 3 characters long' });
         }
 
         // Validate phone number

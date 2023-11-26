@@ -10,6 +10,8 @@ function App() {
     // You can also redirect to the login page or handle the logged-out state here
   };
 
+  <HomePage></HomePage>
+
   return (
     <div className="App">
       {user ? (

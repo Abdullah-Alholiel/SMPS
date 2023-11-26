@@ -46,4 +46,28 @@ exports.updateSlot = async (req, res) => {
     }
 };
 
+// Function to update  parking slots
+exports.updaterealSlots = async (req, res) => {
+    try {
+        const slotsData = req.body.slots;
+        
+        for (const slot of slotsData) {
+            // Log the incoming data for each slot
+            console.log(`Updating slot ${slot.slotNumber} with distance ${slot.currentDistance} and status ${slot.status}`);
+
+            await ParkingSlot.findOneAndUpdate(
+                { slotNumber: slot.slotNumber },
+                {
+                    currentDistance: slot.currentDistance,
+                    status: slot.status
+                }
+            );
+        }
+
+        res.status(200).send({ message: 'Parking slots updated' });
+    } catch (error) {
+        res.status(500).send({ error: 'Error updating parking slots' });
+    }
+};
+
 // Add more functions as needed for creating, deleting, etc.

@@ -15,6 +15,8 @@ function HomePage({ user, onLogout }) {
       <button onClick={handleLogout}>Logout</button>
     </div>
   );
+
+  
 }
 
 export default HomePage;
