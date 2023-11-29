@@ -17,11 +17,17 @@
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },
+  "devDependencies": {
+    "concurrently": "^7.0.0"
+  },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "concurrently \"npm run start --prefix backend\" \"react-scripts start\"",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "start:backend": "npm start --prefix backend",
+    "start:frontend": "react-scripts start",
+    "build:frontend": "react-scripts build"
   },
   "eslintConfig": {
     "extends": [
