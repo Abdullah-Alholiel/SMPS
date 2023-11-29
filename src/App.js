@@ -7,10 +7,8 @@ function App() {
 
   const handleLogout = () => {
     setUser(null);
-    // You can also redirect to the login page or handle the logged-out state here
+    // Add any additional logout logic here if needed
   };
-
-  <HomePage></HomePage>
 
   return (
     <div className="App">
@@ -24,6 +22,7 @@ function App() {
 }
 
 export default App;
+
 
 
 
