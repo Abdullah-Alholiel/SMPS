@@ -15,7 +15,7 @@ exports.getAllSlots = async (req, res) => {
 };
 
 // Function to update a parking slot
-exports.updateSlot = async (req, res) => {
+exports.updateSlotreservation = async (req, res) => {
     const { slotNumber, currentDistance, reservedBy } = req.body;
     try {
         // Find a parking slot based on the provided slot number
@@ -47,7 +47,7 @@ exports.updateSlot = async (req, res) => {
 };
 
 // Function to update  parking slots
-exports.updaterealSlots = async (req, res) => {
+exports.updaterealtimeSlots = async (req, res) => {
     try {
         const slotsData = req.body.slots;
         

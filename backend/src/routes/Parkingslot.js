@@ -23,9 +23,10 @@ router.get('/initialize-parking-slots', async (req, res) => {
 
 
 router.get('/parkingSlots', parkingSlotController.getAllSlots);
-router.put('/parkingSlots/:slotNumber', parkingSlotController.updateSlot);
-router.post('/api/parkingupdate', parkingSlotController.updaterealSlots);
+router.put('/parkingSlots/:slotNumber', parkingSlotController.updateSlotreservation);
+router.post('/api/parkingupdate', parkingSlotController.updaterealtimeSlots);
 
 // Add more routes for creating, deleting slots, etc.
+
 
 module.exports = router;
