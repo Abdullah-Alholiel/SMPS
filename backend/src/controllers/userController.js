@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { hashPassword } = require('../middleware/auth');
 
 // Register a new user
 exports.register = async (req, res) => {
@@ -50,7 +51,7 @@ exports.logout = async (req, res) => {
 // Update user needs to updated to take token in consideration
 exports.updateUser = async (req, res) => {
     // Extracting the username and other update fields from the request body
-    const { username, email, password, phoneNumber } = req.body;
+    const { username, email,  phoneNumber } = req.body;
 
     try {
         // Validate email
@@ -58,10 +59,6 @@ exports.updateUser = async (req, res) => {
             return res.status(400).send({ error: 'Invalid email format' });
         }
 
-        // Validate password
-        if (password && password.length < 3) {
-            return res.status(400).send({ error: 'Password must be at least 3 characters long' });
-        }
 
         // Validate phone number
         if (phoneNumber && !phoneNumber.match(/^\d{10,}$/)) {
@@ -76,13 +73,20 @@ exports.updateUser = async (req, res) => {
             return res.status(404).send({ error: 'User not found' });
         }
 
-        // Update the user's information
-        if (email) user.email = email;
-        if (phoneNumber) user.phoneNumber = phoneNumber;
-        if (password) user.password = await bcrypt.hash(password, 8);
+        // // Check if the authenticated user matches the user being updated
+        // if (req.user.token !== req.user.token) {
+        //     return res.status(401).send({ error: 'Unauthorized: You are not allowed to update this user' });
+        // }
 
-        // Save the user to the database
-        await user.save();
+
+                // Update the user's information
+                if (email) user.email = email;
+                if (phoneNumber) user.phoneNumber = phoneNumber;
+
+        
+                // Save the user to the database
+                await user.save();
+        
 
         // Return the updated user
         res.send({ message: 'User updated successfully', user });
@@ -90,3 +94,4 @@ exports.updateUser = async (req, res) => {
         res.status(500).send({ error: 'Update failed', details: error.message });
     }
 };
+
