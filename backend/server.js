@@ -7,7 +7,7 @@ const errorHandler = require('./src/middleware/errorHandler');
 
 const app = express();
 
-app.use(cors({ origin: 'http://localhost:3001' }));
+app.use(cors({ origin: 'http://localhost:3000' }));
 app.use(express.json());
 app.use((req, res, next) => {
     console.log(`Incoming request: ${req.method} ${req.path}`);

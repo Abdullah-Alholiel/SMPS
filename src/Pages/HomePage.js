@@ -1,22 +1,21 @@
 import React from 'react';
+import { Box, Button, Text, VStack } from '@chakra-ui/react';
+import { Link } from 'react-router-dom';
 
-function HomePage({ user, onLogout }) {
-  const handleLogout = () => {
-    // Clear the authentication token
-    localStorage.removeItem('token');
-
-    // Call the onLogout prop to update the state in the parent component
-    onLogout();
-  };
-
+const HomePage = () => {
   return (
-    <div>
-      <h1>Welcome, {user.username}</h1>
-      <button onClick={handleLogout}>Logout</button>
-    </div>
+    <VStack spacing={4}>
+      <Text fontSize="2xl">Welcome to Smart Parking System</Text>
+      <Box>
+        <Link to="/login">
+          <Button colorScheme="teal">Login</Button>
+        </Link>
+        <Link to="/signup">
+          <Button colorScheme="teal" ml={2}>Sign Up</Button>
+        </Link>
+      </Box>
+    </VStack>
   );
-
-  
-}
+};
 
 export default HomePage;

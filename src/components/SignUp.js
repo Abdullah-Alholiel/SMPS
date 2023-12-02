@@ -1,22 +1,61 @@
 import React, { useState } from 'react';
+import { Box, FormControl, FormLabel, Input, Button } from '@chakra-ui/react';
+import axios from 'axios';
 
-function SignUp({ onAuth }) {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+const SignUp = () => {
+  const [userData, setUserData] = useState({
+    username: '',
+    email: '',
+    phoneNumber: '',
+    password: '',
+    confirmPassword: '',
+  });
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        // Implement signup logic here
-        // On successful signup: onAuth(userData);
-    };
+  const handleChange = (e) => {
+    setUserData({ ...userData, [e.target.name]: e.target.value });
+  };
 
-    return (
-        <form onSubmit={handleSubmit}>
-            <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Username" />
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" />
-            <button type="submit">Sign Up</button>
-        </form>
-    );
-}
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post('/users/register', userData);
+      console.log('User registered:', response.data);
+      // Add logic for handling successful registration
+    } catch (error) {
+      console.error('Error during registration:', error);
+      // Add logic for handling registration error
+    }
+  };
+
+  return (
+    <Box my={8} textAlign="left">
+      <form onSubmit={handleSubmit}>
+        <FormControl isRequired>
+          <FormLabel>Username</FormLabel>
+          <Input type="text" name="username" onChange={handleChange} />
+        </FormControl>
+        <FormControl isRequired mt={4}>
+          <FormLabel>Email</FormLabel>
+          <Input type="email" name="email" onChange={handleChange} />
+        </FormControl>
+        <FormControl isRequired mt={4}>
+          <FormLabel>Phone Number</FormLabel>
+          <Input type="text" name="phoneNumber" onChange={handleChange} />
+        </FormControl>
+        <FormControl isRequired mt={4}>
+          <FormLabel>Password</FormLabel>
+          <Input type="password" name="password" onChange={handleChange} />
+        </FormControl>
+        <FormControl isRequired mt={4}>
+          <FormLabel>Confirm Password</FormLabel>
+          <Input type="password" name="confirmPassword" onChange={handleChange} />
+        </FormControl>
+        <Button width="full" mt={4} type="submit">
+          Sign Up
+        </Button>
+      </form>
+    </Box>
+  );
+};
 
 export default SignUp;

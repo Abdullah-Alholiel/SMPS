@@ -1,31 +1,76 @@
 import React, { useState } from 'react';
-import { login } from '../services/authService';
+import { Box, FormControl, FormLabel, Input, Button } from '@chakra-ui/react';
+import axios from 'axios';
+import { Navigate } from 'react-router-dom';
+import { API_URL } from '../services/authService'
 
-function Login({ onLogin }) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+const Login = () => {
+  const [user_email, setUserName] = useState('');
+  const [user_password, setPassword] = useState('');
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const user = await login(username, password);
-      onLogin(user);
-    } catch (error) {
-      setError(error.message);
-    }
+  const loginCheck = (event) => {
+    event.preventDefault();
+    console.log("tried");
+    axios
+      .post('https://shy-frog-boot.cyclic.app/users/login', {
+        username: user_email,
+        password: user_password,
+      })
+      .then((response) => {
+        if (!response.data.token) {
+          console.log("no data found");
+          // Alert.alert("Login", "Invalid Credentials");
+        } else {
+          console.log("data found");
+          global.email = user_email;
+          
+        }
+        Navigate('/dashboard');
+      })
+      .catch((error) => console.log(error));
   };
 
   return (
-    <div>
-      <form onSubmit={handleLogin}>
-        <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" />
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
-        <button type="submit">Login</button>
+    <Box>
+      <form onSubmit={ loginCheck} >
+        <FormControl>
+          <FormLabel>Username</FormLabel>
+          <Input type="text" name="username" value={user_email} onChange={(e) => setUserName(e.target.value)} />
+        </FormControl>
+        <FormControl>
+          <FormLabel>Password</FormLabel>
+          <Input type="password" name="password" value={user_password} onChange={(e) => setPassword(e.target.value)} />
+        </FormControl>
+        <Button type="submit" colorScheme="teal" onSubmit= {()=>{loginCheck()} } mt={4}>Login</Button >
       </form>
-      {error && <p>{error}</p>}
-    </div>
+    </Box>
   );
-}
+};
 
 export default Login;
+
+
+
+/*
+const auth = useAuth();
+const navigate = useNavigate();
+const [credentials, setCredentials] = useState({ username: '', password: '' });
+
+const handleChange = (e) => {
+  setCredentials({ ...credentials, [e.target.name]: e.target.value });
+};
+
+const handleSubmit = async (event) => {
+  event.preventDefault();
+  try {
+    const response = await axios.post('/users/login', credentials);
+    console.log('User logged in:', response.data);
+    if (response.data.token) {
+      auth.login(credentials.username, credentials.password);
+      navigate('/dashboard');
+    }
+  } catch (error) {
+    console.error('Error during login:', error);
+  }
+} ;
+*/
