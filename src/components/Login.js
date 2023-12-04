@@ -1,76 +1,51 @@
 import React, { useState } from 'react';
-import { Box, FormControl, FormLabel, Input, Button } from '@chakra-ui/react';
+import { Box, FormControl, FormLabel, Input, Button, useToast } from '@chakra-ui/react';
 import axios from 'axios';
-import { Navigate } from 'react-router-dom';
-import { API_URL } from '../services/authService'
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-  const [user_email, setUserName] = useState('');
-  const [user_password, setPassword] = useState('');
+  const navigate = useNavigate();
+  const toast = useToast();
+  const [credentials, setCredentials] = useState({ username: '', password: '' });
 
-  const loginCheck = (event) => {
-    event.preventDefault();
-    console.log("tried");
-    axios
-      .post('https://shy-frog-boot.cyclic.app/users/login', {
-        username: user_email,
-        password: user_password,
-      })
-      .then((response) => {
-        if (!response.data.token) {
-          console.log("no data found");
-          // Alert.alert("Login", "Invalid Credentials");
-        } else {
-          console.log("data found");
-          global.email = user_email;
-          
-        }
-        Navigate('/dashboard');
-      })
-      .catch((error) => console.log(error));
+  const handleChange = (e) => {
+    setCredentials({ ...credentials, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post('https://shy-frog-boot.cyclic.app/users/login', credentials);
+      if (response.data.token) {
+        localStorage.setItem('user', JSON.stringify(response.data)); // Store token
+        toast({ title: 'Login successful', status: 'success', duration: 3000, isClosable: true });
+        navigate('/dashboard'); // Redirect to dashboard
+      } else {
+        toast({ title: 'Invalid credentials', status: 'error', duration: 3000, isClosable: true });
+      }
+    } catch (error) {
+      toast({ title: 'Login failed', description: error.response.data.message, status: 'error', duration: 3000, isClosable: true });
+    }
   };
 
   return (
     <Box>
-      <form onSubmit={ loginCheck} >
-        <FormControl>
+      <form onSubmit={handleSubmit}>
+        {/* Form fields with Chakra UI */}
+        <FormControl isRequired>
           <FormLabel>Username</FormLabel>
-          <Input type="text" name="username" value={user_email} onChange={(e) => setUserName(e.target.value)} />
+          <Input type="text" name="username" value={credentials.username} onChange={handleChange} />
         </FormControl>
-        <FormControl>
+        <FormControl isRequired>
           <FormLabel>Password</FormLabel>
-          <Input type="password" name="password" value={user_password} onChange={(e) => setPassword(e.target.value)} />
+          <Input type="password" name="password" value={credentials.password} onChange={handleChange} />
         </FormControl>
-        <Button type="submit" colorScheme="teal" onSubmit= {()=>{loginCheck()} } mt={4}>Login</Button >
+        <Button type="submit" colorScheme="blue" mt={4}>
+          Login
+        </Button>
       </form>
     </Box>
   );
 };
 
 export default Login;
-
-
-
-/*
-const auth = useAuth();
-const navigate = useNavigate();
-const [credentials, setCredentials] = useState({ username: '', password: '' });
-
-const handleChange = (e) => {
-  setCredentials({ ...credentials, [e.target.name]: e.target.value });
-};
-
-const handleSubmit = async (event) => {
-  event.preventDefault();
-  try {
-    const response = await axios.post('/users/login', credentials);
-    console.log('User logged in:', response.data);
-    if (response.data.token) {
-      auth.login(credentials.username, credentials.password);
-      navigate('/dashboard');
-    }
-  } catch (error) {
-    console.error('Error during login:', error);
-  }
-} ;
-*/

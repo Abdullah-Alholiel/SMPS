@@ -13,7 +13,7 @@ const Dashboard = () => {
       <Sidebar links={[
       { path: '/parking-slots', icon: FaParking, label: 'Parking Slots' },
       { path: '/dashboard', icon: FaChartBar, label: 'Dashboard' },
-      { path: '/profile', icon: FaUserCircle, label: 'Profile' },
+      { path: '/Profile', icon: FaUserCircle, label: 'Profile' },
       { path: '/logout', icon: FaSignOutAlt, label: 'Logout' , onClick: () => {
         auth.logout();},
     } ]}/>

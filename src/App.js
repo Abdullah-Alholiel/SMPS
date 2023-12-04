@@ -6,6 +6,7 @@ import HomePage from './Pages/HomePage';
 import Dashboard from './Pages/Dashboard';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
+import Profile from './components/Profile';
 //import PrivateRoute from './util/Privatroute.js';
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/logout" element={<HomePage />} />
+            <Route path="/profile" element={<Profile />} />
             <Route
               path="/dashboard"
               element={

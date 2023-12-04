@@ -3,12 +3,7 @@ const parkingSlotController = require('../controllers/ParkingslotController');
 const router = express.Router();
 const ParkingSlot = require('../models/ParkingSlot');
 
-// Simulate parking slots data
-const parkingSlotsTemplate = [
-    { slotNumber: 1, isAvailable: true, currentDistance: 150, reservedBy: null },
-    { slotNumber: 2, isAvailable: true, currentDistance: 150, reservedBy: null },
-    { slotNumber: 3, isAvailable: true, currentDistance: 150, reservedBy: null }
-];
+
 
 // Temporary route to initialize parking slots that can be used for testing and then admin only 
 router.get('/initialize-parking-slots', async (req, res) => {

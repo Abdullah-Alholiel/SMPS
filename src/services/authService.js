@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'https://shy-frog-boot.cyclic.app';
+const API_URL = 'http://localhost:3001';
 const REGISTER_URL = '/users/register';
 const LOGIN_URL = '/users/login';
 
