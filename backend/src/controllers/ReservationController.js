@@ -21,6 +21,7 @@ exports.createReservation = async (req, res) => {
 
         // Update the status of the parking slot to 'reserved'
         slot.reservedBy = userId;
+        slot.reservedByUser = reservation.user.username;
         slot.status = 'reserved';
         await slot.save({ session });
 
@@ -40,7 +41,7 @@ exports.createReservation = async (req, res) => {
 // Update the status of a parking slot based on sensor data
 exports.updateParkingSlot = async (req, res) => {
     try {
-        const { slotNumber, currentDistance } = req.body;
+        const { slotNumber, currentDistance, status } = req.body;
         const slot = await ParkingSlot.findOne({ slotNumber });
         if (!slot) {
             return res.status(404).send({ error: 'Parking slot not found' });
@@ -50,7 +51,7 @@ exports.updateParkingSlot = async (req, res) => {
         if (currentDistance < slot.distanceThreshold) {
             slot.status = slot.reservedBy ? 'occupied' : 'unauthorized';
         } else {
-            slot.status = 'available';
+            slot.status = status || 'available';
             slot.reservedBy = null; // Clear any reservation if the slot is now available
         }
 
@@ -76,12 +77,15 @@ exports.endReservation = async (req, res) => {
 
         // End the reservation by setting the end time
         reservation.endTime = new Date();
+        reservation.status = 'ended';
+        reservation.user = null;
         await reservation.save({ session });
 
         // Update the associated parking slot status to 'available'
         const slot = await ParkingSlot.findById(reservation.parkingSlot);
         slot.status = 'available';
         slot.reservedBy = null;
+        slot.reservedByUser = null;
         await slot.save({ session });
 
         // Commit the transaction and send a success response

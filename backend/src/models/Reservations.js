@@ -6,6 +6,11 @@ const reservationSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
+    reservedBy: {
+        type: mongoose.Schema.Types.String,
+        ref: 'User.username' ,
+        default: null
+    },
     parkingSlot: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'ParkingSlot',

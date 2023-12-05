@@ -33,7 +33,7 @@ exports.updateSlotreservation = async (req, res) => {
 
         // Update the current distance and reservation details of the slot
         slot.currentDistance = currentDistance;
-        slot.reservedBy = reservedBy || null; // Update the reservation
+        slot.reservedBy = null; // Update the reservation
         
         // Save the updated slot information to the database
         await slot.save();

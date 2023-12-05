@@ -41,7 +41,7 @@ exports.logout = async (req, res) => {
             return token.token !== req.token;
         });
         await req.user.save();
-        res.send({ message: 'Logout successful' });
+        res.send({ message: 'Logout successful', token: req.user.token });
     } catch (error) {
         res.status(500).send({ error: 'Logout failed', details: error.message });
     }

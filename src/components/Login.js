@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Box, FormControl, FormLabel, Input, Button, useToast } from '@chakra-ui/react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Cookies from 'universal-cookie';
 
 const Login = () => {
   const navigate = useNavigate();
   const toast = useToast();
+  const cookies = new Cookies();
   const [credentials, setCredentials] = useState({ username: '', password: '' });
 
   const handleChange = (e) => {
@@ -17,7 +19,8 @@ const Login = () => {
     try {
       const response = await axios.post('https://shy-frog-boot.cyclic.app/users/login', credentials);
       if (response.data.token) {
-        localStorage.setItem('user', JSON.stringify(response.data)); // Store token
+        // Store token in cookies
+        cookies.set('TOKEN', response.data.token, { path: '/' });
         toast({ title: 'Login successful', status: 'success', duration: 3000, isClosable: true });
         navigate('/dashboard'); // Redirect to dashboard
       } else {
@@ -31,7 +34,6 @@ const Login = () => {
   return (
     <Box>
       <form onSubmit={handleSubmit}>
-        {/* Form fields with Chakra UI */}
         <FormControl isRequired>
           <FormLabel>Username</FormLabel>
           <Input type="text" name="username" value={credentials.username} onChange={handleChange} />
@@ -40,9 +42,7 @@ const Login = () => {
           <FormLabel>Password</FormLabel>
           <Input type="password" name="password" value={credentials.password} onChange={handleChange} />
         </FormControl>
-        <Button type="submit" colorScheme="blue" mt={4}>
-          Login
-        </Button>
+        <Button type="submit" colorScheme="blue" mt={4}>Login</Button>
       </form>
     </Box>
   );

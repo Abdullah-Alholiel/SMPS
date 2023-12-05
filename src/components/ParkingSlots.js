@@ -1,26 +1,52 @@
-import React from 'react';
-import { Box, Text, Button } from "@chakra-ui/react";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Table, Thead, Tbody, Tr, Th, Td, Box, Heading } from '@chakra-ui/react';
 
 const ParkingSlots = () => {
-  // Placeholder data. Fetch real data from backend.
-  const slots = [
-    { id: 1, status: 'available' },
-    { id: 2, status: 'available' },
-    { id: 3, status: 'occupied' },
-  ];
+  const [parkingSlots, setParkingSlots] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('http://localhost:3001/parkingSlots');
+        setParkingSlots(response.data);
+      } catch (error) {
+        console.error('Error fetching parking slots data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
-    <Box>
-      {slots.map(slot => (
-        <Box key={slot.id} p={4} boxShadow="md" mb={4}>
-          <Text>Parking Slot {slot.id}</Text>
-          <Button size="sm" colorScheme={slot.status === 'available' ? 'green' : 'red'}>
-            {slot.status === 'available' ? 'Reserve' : 'Occupied'}
-          </Button>
-        </Box>
-      ))}
+    <Box w="100%" p={4}>
+      <Heading as="h2" size="lg" mb={4}>Parking Slots</Heading>
+      <Table variant="simple">
+        <Thead>
+          <Tr>
+            <Th>Slot Number</Th>
+            <Th>Status</Th>
+            <Th>Current Distance</Th>
+            <Th>Reserved By</Th>
+            <Th>Reserved By User</Th>
+            <Th>Last Updated</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {parkingSlots.map(slot => (
+            <Tr key={slot._id}>
+              <Td>{slot.slotNumber}</Td>
+              <Td>{slot.status}</Td>
+              <Td>{slot.currentDistance}</Td>
+              <Td>{slot.reservedBy || 'Not Reserved'}</Td>
+              <Td>{slot.reservedByUser || null}. {slot.reservedByUser ? 'User' : null}</Td>
+              <Td>{new Date(slot.lastUpdated).toLocaleString()}</Td>
+            </Tr>
+          ))}
+        </Tbody>
+      </Table>
     </Box>
   );
-}
+};
 
 export default ParkingSlots;

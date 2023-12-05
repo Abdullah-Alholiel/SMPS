@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import {
-  VStack, Flex, HStack, Text, Button, Tag, Circle, ChakraProvider, useToast, useColorMode
+  VStack, Flex, HStack, Text, Button, Tag, Circle, ChakraProvider, useToast, useColorMode, Container
 } from "@chakra-ui/react";
 import { Clock, MapPin, Car, Unlock, Lock } from "lucide-react";
 
@@ -37,7 +37,8 @@ const SmartParkingDashboard = () => {
   // Define a function to get color based on color mode
   const color = (light, dark) => (colorMode === "light" ? light : dark);
    return (
-    <ChakraProvider>
+     <ChakraProvider>
+      <Container maxW="container.xl" p={0} m={0}>
       <div className="dashboard-container">
         <header className="dashboard-header">
           {/* Dashboard Header */}
@@ -97,9 +98,11 @@ const SmartParkingDashboard = () => {
                 {slot.reserved ? "Reserved" : "Available"}
               </Tag>
             </Flex>
+            
           ))}
         </aside>
       </div>
+      </Container>
     </ChakraProvider>
   );
 };
