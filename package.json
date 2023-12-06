@@ -30,7 +30,7 @@
   },
     "scripts": {
       "start": "concurrently \"npm run start --prefix backend\" \"react-scripts start\"",
-      "build": "react-scripts build",
+      "build": "react-scripts",
       "test": "react-scripts test",
       "eject": "react-scripts eject",
       "start:backend": "npm start --prefix backend",

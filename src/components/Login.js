@@ -17,7 +17,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('https://shy-frog-boot.cyclic.app/users/login', credentials);
+      const response = await axios.post('https://spmsdissertation-abdullah-alholaiels-projects.vercel.app/users/login', credentials);
       if (response.data.token) {
         // Store token in cookies
         cookies.set('TOKEN', response.data.token, { path: '/' });
