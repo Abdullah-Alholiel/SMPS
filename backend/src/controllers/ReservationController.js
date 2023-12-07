@@ -26,6 +26,10 @@ exports.createReservation = async (req, res) => {
         if (!userId || !slotNumber) {
             throw new Error('userId and slotNumber are required');
         }
+        const existingReservation = await Reservation.findOne({ userId, slotNumber, reservationStatus: 'active' });
+        if (existingReservation) {
+            return res.status(400).send({ error: 'User already has an active reservation for this slot' });
+        }
         await updateParkingSlotStatus(slotNumber, 'reserved', userId, session);
         const reservation = new Reservation({ userId, slotNumber });
         // find slot number and save it corrosponding slot Id

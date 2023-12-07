@@ -34,7 +34,7 @@ if (auth) {
     <Flex h="100vh">
       <Sidebar links={links} />
       <Box flex="10" p="5">
-        <Heading as="h1" mb="4">Dashboard</Heading>
+        <Heading as="h1" mb="4">SPMS Dashboard</Heading>
         <Outlet />
       </Box>
     </Flex>
