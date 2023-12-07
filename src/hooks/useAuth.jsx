@@ -1,4 +1,3 @@
-// src/hooks/useAuth.js
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import Cookies from 'universal-cookie';
 import axios from 'axios';
@@ -15,15 +14,14 @@ export const AuthProvider = ({ children }) => {
       try {
         const token = cookies.get('TOKEN');
         if (token) {
+          const result = await axios.get('https://shy-frog-boot.cyclic.app/users/profile', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
           setUser({ token });
+          setMessage(result.data.message);
         }
-
-        const result = await axios.get('https://shy-frog-boot.cyclic.app/users/profile', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setMessage(result.data.message);
       } catch (error) {
         // Handle error
       }
@@ -37,13 +35,13 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
   };
 
-  const logout = (userData) => {
-    cookies.remove('TOKEN', { path: '/dashboard' });
-    setUser(userData.TOKEN =0);
+  const logout = () => {
+    cookies.remove('TOKEN', { path: '/' }); // Ensure path matches the one used in login
+    setUser(null); // Clear user state
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, message }}>
       {children}
     </AuthContext.Provider>
   );

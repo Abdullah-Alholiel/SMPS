@@ -19,9 +19,9 @@ const parkingSlotSchema = new mongoose.Schema({
     type: Number,
     default: 400 // Assuming distance is a measurable value
   },
-  reservedByID: {
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User._id', // Reference to the User model
+    ref: 'User', // Reference to the User model
     default: null
   },
 

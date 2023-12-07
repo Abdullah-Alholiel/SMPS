@@ -7,7 +7,9 @@ const reservationController = require('../controllers/ReservationController');
 router.post('/reservations/createreservation', reservationController.createReservation);
 
 // Update the status of a parking slot based on sensor data or manual entry
-router.put('/parking-slots/:slotNumber', reservationController.updateParkingSlot);
+//router.put('/parking-slots/:slotNumber', reservationController.updateParkingSlot);
+
+// Handle overstay and unauthorized parking
 router.put('/reservations/:reservationId/overstay', reservationController.handleOverstay);
 router.put('/parking-slots/:slotNumber/unauthorized', reservationController.handleUnauthorizedParking);
 

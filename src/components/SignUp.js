@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, FormControl, FormLabel, Input, Button, useToast } from '@chakra-ui/react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Cookies from 'universal-cookie';
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -34,9 +35,12 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const cookies = new Cookies();
     if (!isValid()) return;
     try {
-      const response = await axios.post('https://shy-frog-boot.cyclic.app/users/register', userData);
+      const response = await axios.post('https://fluffy-wasp-windbreaker.cyclic.app/users/register', userData);
+      //save response in cookies
+      cookies.set('User', response.data, { path: '/' });
       toast({ title: 'Registration successful', status: 'success', duration: 3000, isClosable: true });
       navigate('/login'); // Redirect to login after successful registration
     } catch (error) {

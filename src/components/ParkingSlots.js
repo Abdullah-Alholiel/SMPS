@@ -9,6 +9,7 @@ const ParkingSlots = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get('http://localhost:3001/parkingSlots');
+        console.log(response.data);  
         setParkingSlots(response.data);
       } catch (error) {
         console.error('Error fetching parking slots data:', error);
@@ -26,6 +27,7 @@ const ParkingSlots = () => {
           <Tr>
             <Th>Slot Number</Th>
             <Th>Status</Th>
+            <Th>Reservation Id</Th>
             <Th>Current Distance</Th>
             <Th>Reserved By</Th>
             <Th>Reserved By User</Th>
@@ -37,6 +39,7 @@ const ParkingSlots = () => {
             <Tr key={slot._id}>
               <Td>{slot.slotNumber}</Td>
               <Td>{slot.status}</Td>
+              <Td>{slot.reservationId || 'Not Reserved'}</Td>
               <Td>{slot.currentDistance}</Td>
               <Td>{slot.reservedBy || 'Not Reserved'}</Td>
               <Td>{slot.reservedByUser || null}. {slot.reservedByUser ? 'User' : null}</Td>

@@ -2,93 +2,78 @@ const ParkingSlot = require('../models/ParkingSlot');
 const Reservation = require('../models/Reservations');
 const mongoose = require('mongoose');
 
+// Helper function to update parking slot status
+async function updateParkingSlotStatus(slotNumber, status, userId, session) {
+    const slot = await ParkingSlot.findOne({ slotNumber }).session(session);
+    if (!slot) {
+        throw new Error('Parking slot not found');
+    }
+    slot.status = status;
+    if (status === 'reserved') {
+        slot.userId = new mongoose.Types.ObjectId(userId);
+    } else {
+        slot.userId = null;
+    }
+    await slot.save({ session });
+}
+
 // Create a new reservation
 exports.createReservation = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
         const { userId, slotNumber } = req.body;
-
-        // Check if the parking slot is available for reservation
-        const slot = await ParkingSlot.findOne({ slotNumber });
-        if (!slot || slot.status !== 'available') {
-            throw new Error('Parking slot not available or already reserved');
+        if (!userId || !slotNumber) {
+            throw new Error('userId and slotNumber are required');
         }
-
-        // Create a new reservation in the database
-        const reservation = new Reservation({ user: userId, parkingSlot: slot._id });
+        await updateParkingSlotStatus(slotNumber, 'reserved', userId, session);
+        const reservation = new Reservation({ userId, slotNumber });
+        // find slot number and save it corrosponding slot Id
+        const slotId = await ParkingSlot.findOne({ slotNumber }).session(session);
+        reservation.slotId = slotId._id;
+         
         await reservation.save({ session });
-
-        // Update the status of the parking slot to 'reserved'
-        slot.reservedBy = userId;
-        slot.reservedByUser = reservation.user.username;
-        slot.status = 'reserved';
-        await slot.save({ session });
-
-        // Commit the transaction and return a success response
         await session.commitTransaction();
         res.status(201).send({ message: 'Reservation created successfully', reservation });
     } catch (error) {
-        // If an error occurs, abort the transaction and send an error response
         await session.abortTransaction();
         res.status(400).send({ error: error.message });
     } finally {
-        // End the session regardless of transaction success or failure
         session.endSession();
     }
 };
 
-// Update the status of a parking slot based on sensor data
-exports.updateParkingSlot = async (req, res) => {
-    try {
-        const { slotNumber, currentDistance, status } = req.body;
-        const slot = await ParkingSlot.findOne({ slotNumber });
-        if (!slot) {
-            return res.status(404).send({ error: 'Parking slot not found' });
-        }
-
-        // Determine the new status of the slot based on current distance
-        if (currentDistance < slot.distanceThreshold) {
-            slot.status = slot.reservedBy ? 'occupied' : 'unauthorized';
-        } else {
-            slot.status = status || 'available';
-            slot.reservedBy = null; // Clear any reservation if the slot is now available
-        }
-
-        // Save the updated slot information
-        slot.currentDistance = currentDistance;
-        await slot.save();
-        res.status(200).send({ message: 'Parking slot updated successfully', slot });
-    } catch (error) {
-        res.status(500).send({ error: 'Error updating parking slot' });
-    }
-};
-
-// End a reservation for a parking slot
+// End a reservation
 exports.endReservation = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-        const { reservationId } = req.params;
-        const reservation = await Reservation.findById(reservationId);
-        if (!reservation) {
-            throw new Error('Reservation not found');
+        const { userId, slotNumber } = req.body;
+        const reservationId = req.params.reservationId;  // Add reservation ID from request parameters
+
+        if (!userId || !slotNumber) {
+            throw new Error('Missing required fields');
         }
 
-        // End the reservation by setting the end time
+        // Find the specific reservation by ID, userId, and slotNumber
+        const reservation = await Reservation.findOne({
+            _id: reservationId, 
+            userId, 
+            slotNumber, 
+            reservationStatus: 'active'
+        }).session(session);
+
+        if (!reservation) {
+            throw new Error('Active reservation not found');
+        }
+
+        // Update the reservation status to 'completed'
         reservation.endTime = new Date();
-        reservation.status = 'ended';
-        reservation.user = null;
+        reservation.reservationStatus = 'completed';
         await reservation.save({ session });
 
-        // Update the associated parking slot status to 'available'
-        const slot = await ParkingSlot.findById(reservation.parkingSlot);
-        slot.status = 'available';
-        slot.reservedBy = null;
-        slot.reservedByUser = null;
-        await slot.save({ session });
-
-        // Commit the transaction and send a success response
+        // Update parking slot status
+        await updateParkingSlotStatus(slotNumber, 'available', null, session);
         await session.commitTransaction();
         res.status(200).send({ message: 'Reservation ended successfully', reservation });
     } catch (error) {
@@ -98,6 +83,10 @@ exports.endReservation = async (req, res) => {
         session.endSession();
     }
 };
+
+
+
+
 // Handle overstays for a parking reservation
 exports.handleOverstay = async (req, res) => {
     try {
@@ -138,7 +127,6 @@ exports.handleUnauthorizedParking = async (req, res) => {
             // Implement logic for handling unauthorized parking
             // Example: Notifying the admin or initiating a towing process
             slot.status = 'available'; // Optionally reset the slot status
-            slot.reservedBy = null;
             await slot.save();
         }
 
@@ -148,13 +136,13 @@ exports.handleUnauthorizedParking = async (req, res) => {
     }
 };
 
-
-
 // Function to show all reservations
 exports.showAllReservations = async (req, res) => {
     try {
         // Fetch all reservations from the database
-        const reservations = await Reservation.find({});
+// Sorting by startTime in descending order (most recent first)
+const reservations = await Reservation.find({}).sort({ startTime: -1 });
+        
 
         // Check if reservations exist
         if (!reservations || reservations.length === 0) {
@@ -170,3 +158,4 @@ exports.showAllReservations = async (req, res) => {
 };
 
 // Additional controller functions like  etc., can be added here
+

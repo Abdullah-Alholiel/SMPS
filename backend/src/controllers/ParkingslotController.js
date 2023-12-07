@@ -1,22 +1,29 @@
 const ParkingSlot = require('../models/ParkingSlot');
+const User = require('../models/User');
 
-// Function to retrieve all parking slots
+
 exports.getAllSlots = async (req, res) => {
     try {
-        // Retrieve all parking slots from the database
-        const slots = await ParkingSlot.find();
-        
-        // Return the parking slots as a JSON response with a 200 status code
+        const slots = await ParkingSlot.find().lean(); // Use lean() for faster execution
+
+        for (let slot of slots) {
+            if (slot.userId) {
+                const user = await User.findById(slot.userId);
+                slot.reservedBy = user ? user.username : null; // Add username to the slot object
+            } else {
+                slot.reservedBy = null;
+            }
+        }
+
         res.status(200).json(slots);
     } catch (error) {
-        // If there is an error fetching the parking slots, return a 500 status code with an error message
         res.status(500).send({ error: 'Error fetching parking slots' });
     }
 };
 
 // Function to update a parking slot
 exports.updateSlotreservation = async (req, res) => {
-    const { slotNumber, currentDistance, reservedBy } = req.body;
+    const { slotNumber, userId, status } = req.body;
     try {
         // Find a parking slot based on the provided slot number
         const slot = await ParkingSlot.findOne({ slotNumber });
@@ -27,13 +34,13 @@ exports.updateSlotreservation = async (req, res) => {
         }
 
         // Check for unauthorized occupation of the slot
-        if (slot.isOccupied && !slot.reservedBy.equals(reservedBy)) {
+        if (slot.isOccupied && !slot.user.equals(userId)) {
             return res.status(403).send({ error: 'Slot is occupied by an unauthorized vehicle' });
         }
 
-        // Update the current distance and reservation details of the slot
-        slot.currentDistance = currentDistance;
-        slot.reservedBy = null; // Update the reservation
+        // Update the status and user ID of the parking slot
+//        slot.reservedBy = reservedBy ; // Update the reservation
+        slot.status = status;
         
         // Save the updated slot information to the database
         await slot.save();

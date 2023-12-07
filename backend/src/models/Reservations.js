@@ -1,20 +1,19 @@
 const mongoose = require('mongoose');
 
 const reservationSchema = new mongoose.Schema({
-    user: {
+    userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
-    reservedBy: {
-        type: mongoose.Schema.Types.String,
-        ref: 'User.username' ,
-        default: null
+    slotNumber: {
+        type: Number,
+        required: true
     },
-    parkingSlot: {
+    slotId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'ParkingSlot',
-        required: true
+        default: null 
     },
     startTime: {
         type: Date,
@@ -24,7 +23,7 @@ const reservationSchema = new mongoose.Schema({
         type: Date,
         default: null
     },
-    reservationStatus: { // Renamed for clarity
+    reservationStatus: {
         type: String,
         enum: ['active', 'completed', 'cancelled'],
         default: 'active'
@@ -34,3 +33,4 @@ const reservationSchema = new mongoose.Schema({
 const Reservation = mongoose.model('Reservation', reservationSchema);
 
 module.exports = Reservation;
+
