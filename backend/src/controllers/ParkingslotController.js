@@ -1,21 +1,23 @@
 const ParkingSlot = require('../models/ParkingSlot');
 const User = require('../models/User');
+const Reservation = require('../models/Reservations');
 
 
+// ParkingslotController.js
 exports.getAllSlots = async (req, res) => {
     try {
         const slots = await ParkingSlot.find().lean(); // Use lean() for faster execution
-
-        for (let slot of slots) {
+        const slotsWithReservationIds = await Promise.all(slots.map(async (slot) => {
             if (slot.userId) {
-                const user = await User.findById(slot.userId);
-                slot.reservedBy = user ? user.username : null; // Add username to the slot object
-            } else {
-                slot.reservedBy = null;
+                const reservation = await Reservation.findOne({
+                    slotId: slot._id,
+                    reservationStatus: 'active'
+                }).lean();
+                slot.reservationId = reservation ? reservation._id : null;
             }
-        }
-
-        res.status(200).json(slots);
+            return slot;
+        }));
+        res.status(200).json(slotsWithReservationIds);
     } catch (error) {
         res.status(500).send({ error: 'Error fetching parking slots' });
     }

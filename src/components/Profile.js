@@ -18,7 +18,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await axios.post('/users/updateSuer');
+        const response = await axios.get('/users/profile');
         setProfileData(response.data);
       } catch (error) {
         toast({ title: 'Error fetching profile', status: 'error' });

@@ -10,56 +10,73 @@ const SmartParkingDashboard = () => {
     const navigate = useNavigate();
     const { colorMode } = useColorMode();
     const [parkingSlots, setParkingSlots] = useState([]);
+    const userId = localStorage.getItem('user_id'); // Retrieve the current user's ID
 
     useEffect(() => {
-        const fetchParkingSlots = async () => {
-            try {
-                const response = await axios.get('https://fluffy-wasp-windbreaker.cyclic.app/parkingSlots');
-                setParkingSlots(response.data);
-            } catch (error) {
-                toast({
-                    title: 'Error fetching parking slots',
-                    description: error.message,
-                    status: 'error',
-                    duration: 9000,
-                    isClosable: true,
-                });
-            }
-        };
         fetchParkingSlots();
     }, []);
 
-    const handleReserveClick = (slot) => {
-        if (slot.reserved) {
-            // Cancel reservation logic
-            axios.delete(`https://fluffy-wasp-windbreaker.cyclic.app/endreservation/${slot._id}`)
-                .then(() => {
-                    const updatedSlots = parkingSlots.map(s => 
-                        s._id === slot._id ? { ...s, reserved: false } : s);
-                    setParkingSlots(updatedSlots);
-                    toast({
-                        title: "Reservation cancelled",
-                        status: "success",
-                        duration: 2000,
-                        isClosable: true,
-                    });
-                }).catch(error => {
-                    toast({
-                        title: 'Error cancelling reservation',
-                        description: error.message,
-                        status: 'error',
-                        duration: 9000,
-                        isClosable: true,
-                    });
-                });
-        } else {
-            // Proceed to reservation form
-            navigate(`/dashboard/reservations`, { state: { slotNumber: slot.slotNumber } });
+    // Fetch parking slots from the server and update the state
+// Dashboard.js
+    const fetchParkingSlots = async () => {
+        try {
+            const response = await axios.get('https://fluffy-wasp-windbreaker.cyclic.app/parkingSlots');
+            const updatedSlots = response.data.map(slot => ({
+                ...slot,
+                reserved: slot.userId === userId,
+                reservationId: slot.reservationId // Now includes the reservation ID
+            }));
+            setParkingSlots(updatedSlots);
+        } catch (error) {
+            toast({
+                title: 'Error fetching parking slots',
+                description: error.message,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+            });
         }
     };
 
-    const color = (light, dark) => (colorMode === "light" ? light : dark);
+// get reservation id from served for each user for specific parkign slot
 
+
+// Handle click on the Reserve/Cancel button
+const handleReserveClick = async (slot) => {
+    if (slot.reserved) {
+        // Cancel reservation logic
+        try {
+            await axios.delete(`https://fluffy-wasp-windbreaker.cyclic.app/reservations/${slot.reservationId}`, {
+                data: {
+                    userId: userId,
+                    slotNumber: slot.slotNumber
+                }
+            });
+            toast({
+                title: "Reservation cancelled",
+                description: "Your reservation has been cancelled",
+                status: "success",
+                duration: 3000,
+                isClosable: true,
+            });
+            fetchParkingSlots(); // Refresh the slots
+        } catch (error) {
+            toast({
+                title: 'Error cancelling reservation',
+                description: error.message,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+            });
+        }
+    } else {
+        // Redirect to reservation form with slot number
+        navigate(`/dashboard/reservations`, { state: { slotNumber: slot.slotNumber } });
+    }
+};
+
+    // Helper function to determine button color
+    const color = (light, dark) => (colorMode === "light" ? light : dark);
 
     return (
         <ChakraProvider>

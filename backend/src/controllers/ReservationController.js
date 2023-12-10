@@ -18,6 +18,7 @@ async function updateParkingSlotStatus(slotNumber, status, userId, session) {
 }
 
 // Create a new reservation
+// Update the createReservation function in ReservationController.js to save the reservationId when creating a new reservation
 exports.createReservation = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -32,13 +33,10 @@ exports.createReservation = async (req, res) => {
         }
         await updateParkingSlotStatus(slotNumber, 'reserved', userId, session);
         const reservation = new Reservation({ userId, slotNumber });
-        // find slot number and save it corrosponding slot Id
-        const slotId = await ParkingSlot.findOne({ slotNumber }).session(session);
-        reservation.slotId = slotId._id;
-         
-        await reservation.save({ session });
+        const savedReservation = await reservation.save({ session });
+        const reservationId = savedReservation._id;
         await session.commitTransaction();
-        res.status(201).send({ message: 'Reservation created successfully', reservation });
+        res.status(201).send({ message: 'Reservation created successfully', reservation: savedReservation, reservationId });
     } catch (error) {
         await session.abortTransaction();
         res.status(400).send({ error: error.message });

@@ -16,10 +16,10 @@ const DashboardLayout = () => {
   const auth = useAuth();
 
   const handleLogout = () => {
-if (auth) {
-  auth.logout();
-  navigate('/login');
-}
+    if (auth) {
+      auth.logout();
+      navigate('/login');
+    }
   };
 
   const links = [

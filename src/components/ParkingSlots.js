@@ -30,7 +30,7 @@ const ParkingSlots = () => {
             <Th>Reservation Id</Th>
             <Th>Current Distance</Th>
             <Th>Reserved By</Th>
-            <Th>Reserved By User</Th>
+            <Th>is Available</Th>
             <Th>Last Updated</Th>
           </Tr>
         </Thead>
@@ -39,10 +39,10 @@ const ParkingSlots = () => {
             <Tr key={slot._id}>
               <Td>{slot.slotNumber}</Td>
               <Td>{slot.status}</Td>
-              <Td>{slot.reservationId || 'Not Reserved'}</Td>
+              <Td>{slot.userId || 'Not Reserved'}</Td>
               <Td>{slot.currentDistance}</Td>
               <Td>{slot.reservedBy || 'Not Reserved'}</Td>
-              <Td>{slot.reservedByUser || null}. {slot.reservedByUser ? 'User' : null}</Td>
+              <Td> {slot.isAvailable ? 'Yes' : 'No'}</Td>
               <Td>{new Date(slot.lastUpdated).toLocaleString()}</Td>
             </Tr>
           ))}

@@ -1,24 +1,30 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import Cookies from 'universal-cookie';
 import axios from 'axios';
-
+import { useNavigate } from 'react-router-dom';
 const cookies = new Cookies();
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     const fetchData = async () => {
+
+      navigate("/login");
+      // Check if the user is already logged in
       try {
         const token = cookies.get('TOKEN');
         if (token) {
-          const result = await axios.get('https://shy-frog-boot.cyclic.app/users/profile', {
+          const result = await axios.post('https://fluffy-wasp-windbreaker.cyclic.app/users/logout', {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           });
+          console.log(result.data.message);
           setUser({ token });
           setMessage(result.data.message);
         }
@@ -31,12 +37,12 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (userData) => {
-    cookies.set('TOKEN', userData.token, { path: '/' });
+    cookies.set('TOKEN', userData.token, { path: '/login' });
     setUser(userData);
   };
 
   const logout = () => {
-    cookies.remove('TOKEN', { path: '/' }); // Ensure path matches the one used in login
+    cookies.remove('TOKEN', { path: '/login' }); // Ensure path matches the one used in login
     setUser(null); // Clear user state
   };
 
