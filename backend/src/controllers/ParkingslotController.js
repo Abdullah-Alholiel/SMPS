@@ -6,7 +6,7 @@ const Reservation = require('../models/Reservations');
 // Function to get all parking slots
 exports.getAllSlots = async (req, res) => {
     try {
-        const slots = await ParkingSlot.find().lean(); // Use lean() for faster execution
+        const slots = await ParkingSlot.find().populate('userId', 'username').lean(); // Populate the userId field with the username from the User model
         const reservations = await Reservation.find({ reservationStatus: 'active' }).lean(); // Fetch all active reservations
 
         // Create a mapping of slotNumber to reservationId for quick lookup
@@ -15,10 +15,11 @@ exports.getAllSlots = async (req, res) => {
             return map;
         }, {});
 
-        // Include reservationId in the parking slot data if it exists
+        // Include reservationId and username in the parking slot data if it exists
         const slotsWithReservationIds = slots.map(slot => ({
             ...slot,
-            reservationId: reservationMap[slot.slotNumber] || null
+            reservationId: reservationMap[slot.slotNumber] || null,
+            reservedByUsername: slot.userId ? slot.userId.username : null // Include the username
         }));
 
         res.status(200).json(slotsWithReservationIds);

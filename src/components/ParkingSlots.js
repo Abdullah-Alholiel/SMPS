@@ -29,7 +29,7 @@ const ParkingSlots = () => {
             <Th>Status</Th>
             <Th>Reservation Id</Th>
             <Th>Current Distance</Th>
-            <Th>Reserved By</Th>
+            <Th>Reserved By</Th> {/* Make sure this header is present */}
             <Th>is Available</Th>
             <Th>Last Updated</Th>
           </Tr>
@@ -39,10 +39,10 @@ const ParkingSlots = () => {
             <Tr key={slot._id}>
               <Td>{slot.slotNumber}</Td>
               <Td>{slot.status}</Td>
-              <Td>{slot.userId || 'Not Reserved'}</Td>
+              <Td>{slot.reservationId || 'Not Reserved'}</Td>
               <Td>{slot.currentDistance}</Td>
-              <Td>{slot.reservedBy || 'Not Reserved'}</Td>
-              <Td> {slot.isAvailable ? 'Yes' : 'No'}</Td>
+              <Td>{slot.reservedByUsername || 'Not Reserved'}</Td> {/* Add this line */}
+              <Td>{slot.isAvailable ? 'Yes' : 'No'}</Td>
               <Td>{new Date(slot.lastUpdated).toLocaleString()}</Td>
             </Tr>
           ))}
