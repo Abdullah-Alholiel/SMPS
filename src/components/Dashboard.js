@@ -20,10 +20,10 @@ const SmartParkingDashboard = () => {
 // Dashboard.js
     const fetchParkingSlots = async () => {
         try {
-            const response = await axios.get('https://fluffy-wasp-windbreaker.cyclic.app/parkingSlots');
+            const response = await axios.get('http://localhost:3001/parkingSlots');
             const updatedSlots = response.data.map(slot => ({
                 ...slot,
-                reserved: slot.userId === userId,
+                reserved: slot.userId === userId ? true : false,
                 reservationId: slot.reservationId // Now includes the reservation ID
             }));
             setParkingSlots(updatedSlots);
@@ -43,8 +43,9 @@ const SmartParkingDashboard = () => {
 
 // Handle click on the Reserve/Cancel button
 const handleReserveClick = async (slot) => {
-    if (slot.reserved) {
+    if (slot.userId === userId ) {
         // Cancel reservation logic
+        // Send a DELETE request to the server to cancel the reservatio
         try {
             await axios.delete(`https://fluffy-wasp-windbreaker.cyclic.app/reservations/${slot.reservationId}`, {
                 data: {

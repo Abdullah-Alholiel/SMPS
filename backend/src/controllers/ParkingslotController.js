@@ -6,20 +6,21 @@ const Reservation = require('../models/Reservations');
 // Function to get all parking slots
 exports.getAllSlots = async (req, res) => {
     try {
-        const slots = await ParkingSlot.find().populate('userId', 'username').lean(); // Populate the userId field with the username from the User model
-        const reservations = await Reservation.find({ reservationStatus: 'active' }).lean(); // Fetch all active reservations
+        // Fetch all parking slots with user details populated
+        const slots = await ParkingSlot.find().populate('userId', 'username').lean();
 
-        // Create a mapping of slotNumber to reservationId for quick lookup
+        const reservations = await Reservation.find({ reservationStatus: 'active' }).lean();
+
         const reservationMap = reservations.reduce((map, reservation) => {
             map[reservation.slotNumber] = reservation._id.toString();
             return map;
         }, {});
 
-        // Include reservationId and username in the parking slot data if it exists
         const slotsWithReservationIds = slots.map(slot => ({
             ...slot,
             reservationId: reservationMap[slot.slotNumber] || null,
-            reservedByUsername: slot.userId ? slot.userId.username : null // Include the username
+            // Set reservedBy as the username of the user who reserved the slot
+            reservedBy: slot.userId ? slot.userId.username : null
         }));
 
         res.status(200).json(slotsWithReservationIds);
@@ -27,7 +28,6 @@ exports.getAllSlots = async (req, res) => {
         res.status(500).send({ error: 'Error fetching parking slots' });
     }
 };
-
 // Function to update a parking slot
 exports.updateSlotreservation = async (req, res) => {
     const { slotNumber, userId, status } = req.body;
