@@ -18,32 +18,35 @@ const SmartParkingDashboard = () => {
 
     // Fetch parking slots from the server and update the state
 // Dashboard.js
-    const fetchParkingSlots = async () => {
-        try {
-            const response = await axios.get('http://localhost:3001/parkingSlots');
-            const updatedSlots = response.data.map(slot => ({
-                ...slot,
-                reserved: slot.userId === userId ? true : false,
-                reservationId: slot.reservationId // Now includes the reservation ID
-            }));
-            setParkingSlots(updatedSlots);
-        } catch (error) {
-            toast({
-                title: 'Error fetching parking slots',
-                description: error.message,
-                status: 'error',
-                duration: 9000,
-                isClosable: true,
-            });
-        }
-    };
+// Fetch parking slots from the server and update the state
+const fetchParkingSlots = async () => {
+    try {
+        const response = await axios.get('https://fluffy-wasp-windbreaker.cyclic.app/parkingSlots');
+        const updatedSlots = response.data.map(slot => ({
+            ...slot,
+            // Check if the current user has reserved the slot
+            reserved: slot.userId && slot.userId._id === userId,
+            reservationId: slot.reservationId ? slot.reservationId : null
+        }));
+        setParkingSlots(updatedSlots);
+    } catch (error) {
+        toast({
+            title: 'Error fetching parking slots',
+            description: error.message,
+            status: 'error',
+            duration: 9000,
+            isClosable: true,
+        });
+    }
+};
+
 
 // get reservation id from served for each user for specific parkign slot
 
 
 // Handle click on the Reserve/Cancel button
 const handleReserveClick = async (slot) => {
-    if (slot.userId === userId ) {
+    if (slot.reserved) {
         // Cancel reservation logic
         // Send a DELETE request to the server to cancel the reservatio
         try {

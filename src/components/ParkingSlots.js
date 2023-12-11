@@ -41,8 +41,7 @@ const ParkingSlots = () => {
               <Td>{slot.status}</Td>
               <Td>{slot.reservationId || 'Not Reserved'}</Td>
               <Td>{slot.currentDistance}</Td>
-              <Td>{slot.reservedByUsername || 'Not Reserved'}</Td> {/* Add this line */}
-              <Td>{slot.isAvailable ? 'Yes' : 'No'}</Td>
+              <Td>{slot.userId ? slot.userId.username : 'Not Reserved'}</Td> {/* Update this line */}              <Td>{slot.isAvailable ? 'Yes' : 'No'}</Td>
               <Td>{new Date(slot.lastUpdated).toLocaleString()}</Td>
             </Tr>
           ))}
