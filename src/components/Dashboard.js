@@ -5,6 +5,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { ChakraProvider } from '@chakra-ui/react';
 
+const backendURL = process.env.backendURL;
+
 const SmartParkingDashboard = () => {
     const toast = useToast();
     const navigate = useNavigate();
@@ -17,16 +19,16 @@ const SmartParkingDashboard = () => {
     }, []);
 
     // Fetch parking slots from the server and update the state
-// Dashboard.js
-// Fetch parking slots from the server and update the state
+
 const fetchParkingSlots = async () => {
     try {
-        const response = await axios.get('https://fluffy-wasp-windbreaker.cyclic.app/parkingSlots');
+        const response = await axios.get('https://colorful-fox-hosiery.cyclic.app/parkingSlots');
         const updatedSlots = response.data.map(slot => ({
             ...slot,
-            // Check if the current user has reserved the slot
             reserved: slot.userId && slot.userId._id === userId,
-            reservationId: slot.reservationId ? slot.reservationId : null
+            reservationId: slot.reservationId ? slot.reservationId : null,
+            // Add the userId to the slot data
+            userId: slot.userId ? slot.userId._id : null
         }));
         setParkingSlots(updatedSlots);
     } catch (error) {
@@ -45,12 +47,21 @@ const fetchParkingSlots = async () => {
 
 
 // Handle click on the Reserve/Cancel button
+
 const handleReserveClick = async (slot) => {
-    if (slot.reserved) {
-        // Cancel reservation logic
-        // Send a DELETE request to the server to cancel the reservatio
+    if (slot.reserved && slot.userId !== userId) {
+        // If the slot is reserved by another user, show a message
+        toast({
+            title: "Slot already reserved",
+            description: "This parking slot is already reserved by another user.",
+            status: "warning",
+            duration: 3000,
+            isClosable: true,
+        });
+    } else if (slot.reserved && slot.userId === userId) {
+        // Cancel reservation logic for the current user
         try {
-            await axios.delete(`https://fluffy-wasp-windbreaker.cyclic.app/reservations/${slot.reservationId}`, {
+            await axios.delete(`https://colorful-fox-hosiery.cyclic.app/reservations/${slot.reservationId}`, {
                 data: {
                     userId: userId,
                     slotNumber: slot.slotNumber

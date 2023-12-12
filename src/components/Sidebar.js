@@ -20,7 +20,7 @@ const Sidebar = ({ activePage, links }) => {
       const token = localStorage.getItem('token');
       navigate("/login");
 
-      await axios.post('https://fluffy-wasp-windbreaker.cyclic.app/users/logout' , {
+      await axios.post('https://colorful-fox-hosiery.cyclic.app/users/logout' , {
         headers: {
           Authorization: `Bearer ${token}`
         }

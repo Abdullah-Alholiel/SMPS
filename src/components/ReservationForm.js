@@ -43,7 +43,7 @@ import {
   
         // Send reservation data to the server
         const response = await axios.post(
-          "https://fluffy-wasp-windbreaker.cyclic.app/reservations/createreservation",
+          "https://colorful-fox-hosiery.cyclic.app/reservations/createreservation",
           {
             userId,
             slotNumber,

@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
       try {
         const token = cookies.get('TOKEN');
         if (token) {
-          const result = await axios.post('https://fluffy-wasp-windbreaker.cyclic.app/users/logout', {
+          const result = await axios.post('https://colorful-fox-hosiery.cyclic.app/users/logout', {
             headers: {
               Authorization: `Bearer ${token}`,
             },

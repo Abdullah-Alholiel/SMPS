@@ -16,7 +16,7 @@ export default function AuthComponent() {
     // set configurations for the API call here
     const configuration = {
       method: "get",
-      url: "https://fluffy-wasp-windbreaker.cyclic.app/users/profile",
+      url: "https://colorful-fox-hosiery.cyclic.app/users/profile",
       headers: {
         Authorization: `Bearer ${token}`,
       },

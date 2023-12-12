@@ -8,7 +8,7 @@ const ParkingSlots = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('https://fluffy-wasp-windbreaker.cyclic.app/parkingSlots');
+        const response = await axios.get('https://colorful-fox-hosiery.cyclic.app/parkingSlots');
         console.log(response.data);  
         setParkingSlots(response.data);
       } catch (error) {

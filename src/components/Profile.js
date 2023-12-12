@@ -34,7 +34,7 @@ const Profile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('https://fluffy-wasp-windbreaker.cyclic.app/users/updateUser', profileData);
+      await axios.post('https://colorful-fox-hosiery.cyclic.app/users/updateUser', profileData);
       toast({ title: 'User profile updated', status: 'success', duration: 3000, isClosable: true });
     } catch (error) {
       toast({ title: 'Profile update failed', description: error.response.data.message, status: 'error', duration: 3000, isClosable: true });
