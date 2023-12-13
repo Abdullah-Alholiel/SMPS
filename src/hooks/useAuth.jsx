@@ -37,12 +37,12 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (userData) => {
-    cookies.set('TOKEN', userData.token, { path: '/login' });
+    cookies.set('TOKEN', userData.token, { path: '/' });
     setUser(userData);
   };
 
   const logout = () => {
-    cookies.remove('TOKEN', { path: '/login' }); // Ensure path matches the one used in login
+    cookies.remove('TOKEN'); // Ensure path matches the one used in login
     setUser(null); // Clear user state
   };
 

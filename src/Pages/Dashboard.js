@@ -10,6 +10,7 @@ import ReservationForm from '../components/ReservationForm';
 import Profile from '../components/Profile';
 import { useAuth } from '../hooks/useAuth';
 import {AuthComponent} from '../util/AuthComponent';
+import Cookies from 'universal-cookie';
 
 const DashboardLayout = () => {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ const DashboardLayout = () => {
   const handleLogout = () => {
     if (auth) {
       auth.logout();
+      Cookies.remove('token');
       navigate('/login');
     }
   };

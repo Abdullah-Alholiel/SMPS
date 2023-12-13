@@ -23,7 +23,7 @@ const Login = () => {
                 cookies.set('TOKEN', response.data.token, { path: '/' });
                 cookies.set('userId', response.data.user._id, { path: '/' });
                 cookies.set('User', response.data.user, { path: '/dashboard' });
-                //localStorage.setItem('user_id', response.data.user._id);// Another way of storing user ID in localStorage
+                localStorage.setItem('token', response.data.token);                //localStorage.setItem('user_id', response.data.user._id);// Another way of storing user ID in localStorage
                 localStorage.user_id = response.data.user._id; // Storing user ID in localStorage
                 //another way of storing user id
 

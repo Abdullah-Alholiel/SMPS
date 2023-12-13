@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { VStack, Flex, HStack, Text, Button, Tag, Circle, useToast, useColorMode, Container } from '@chakra-ui/react';
-import { Clock, MapPin, Car, Unlock, Lock } from 'lucide-react';
+import {
+    VStack, Flex, HStack, Text, Button, Tag, Circle, useToast, useColorMode, Container,
+    AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay
+  } from '@chakra-ui/react';import { Clock, MapPin, Car, Unlock, Lock } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { ChakraProvider } from '@chakra-ui/react';
+import { useRef } from 'react';
 
 const backendURL = process.env.backendURL;
 
@@ -12,6 +15,11 @@ const SmartParkingDashboard = () => {
     const navigate = useNavigate();
     const { colorMode } = useColorMode();
     const [parkingSlots, setParkingSlots] = useState([]);
+
+    const [isCancelConfirmOpen, setIsCancelConfirmOpen] = useState(false);
+    const [selectedSlot, setSelectedSlot] = useState(null);
+    const cancelRef = useRef();
+
     const userId = localStorage.getItem('user_id'); // Retrieve the current user's ID
 
     useEffect(() => {
@@ -25,7 +33,7 @@ const fetchParkingSlots = async () => {
         const response = await axios.get('https://colorful-fox-hosiery.cyclic.app/parkingSlots');
         const updatedSlots = response.data.map(slot => ({
             ...slot,
-            reserved: slot.userId && slot.userId._id === userId,
+            reserved: slot.status === 'reserved',
             reservationId: slot.reservationId ? slot.reservationId : null,
             // Add the userId to the slot data
             userId: slot.userId ? slot.userId._id : null
@@ -42,53 +50,62 @@ const fetchParkingSlots = async () => {
     }
 };
 
-
 // get reservation id from served for each user for specific parkign slot
-
-
-// Handle click on the Reserve/Cancel button
-
-const handleReserveClick = async (slot) => {
-    if (slot.reserved && slot.userId !== userId) {
-        // If the slot is reserved by another user, show a message
-        toast({
-            title: "Slot already reserved",
-            description: "This parking slot is already reserved by another user.",
-            status: "warning",
-            duration: 3000,
-            isClosable: true,
-        });
+    // Function to check if the slot is reserved by the current user
+    const isSlotReservedByCurrentUser = (slot) => {
+        return slot.reservedBy === userId;
+    };
+console.log(isSlotReservedByCurrentUser);
+ // Handle click on the Reserve/Cancel button
+ const handleReserveClick = async (slot) => {
+    if (!isSlotReservedByCurrentUser(slot))  {
+      // If the slot is reserved by another user, show a message
+      toast({
+        title: "Slot unavailable",
+        description: "This parking slot is reserved by another user.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     } else if (slot.reserved && slot.userId === userId) {
-        // Cancel reservation logic for the current user
-        try {
-            await axios.delete(`https://colorful-fox-hosiery.cyclic.app/reservations/${slot.reservationId}`, {
-                data: {
-                    userId: userId,
-                    slotNumber: slot.slotNumber
-                }
-            });
-            toast({
-                title: "Reservation cancelled",
-                description: "Your reservation has been cancelled",
-                status: "success",
-                duration: 3000,
-                isClosable: true,
-            });
-            fetchParkingSlots(); // Refresh the slots
-        } catch (error) {
-            toast({
-                title: 'Error cancelling reservation',
-                description: error.message,
-                status: 'error',
-                duration: 9000,
-                isClosable: true,
-            });
-        }
+      // If the slot is reserved by the current user, prompt for cancellation
+      setSelectedSlot(slot);
+      setIsCancelConfirmOpen(true);
     } else {
-        // Redirect to reservation form with slot number
-        navigate(`/dashboard/reservations`, { state: { slotNumber: slot.slotNumber } });
+      // If the slot is not reserved, navigate to the reservation form
+      navigate(`/dashboard/reservations`, { state: { slotNumber: slot.slotNumber } });
     }
-};
+  };
+
+  // Function to cancel a reservation
+  const cancelReservation = async () => {
+    try {
+      await axios.delete(`https://colorful-fox-hosiery.cyclic.app/reservations/${selectedSlot.reservationId}`, {
+        data: {
+          userId: userId,
+          slotNumber: selectedSlot.slotNumber
+        }
+      });
+      toast({
+        title: "Reservation cancelled",
+        description: "Your reservation has been cancelled",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+      fetchParkingSlots(); // Refresh the slots after cancellation
+    } catch (error) {
+      toast({
+        title: 'Error cancelling reservation',
+        description: error.message,
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+      });
+    } finally {
+      setIsCancelConfirmOpen(false); // Close the confirmation dialog
+    }
+  };
 
     // Helper function to determine button color
     const color = (light, dark) => (colorMode === "light" ? light : dark);
@@ -122,10 +139,11 @@ const handleReserveClick = async (slot) => {
                                     <Button
                                         onClick={() => handleReserveClick(slot)}
                                         leftIcon={slot.reserved ? <Unlock color={color('black', 'white')}/> : <Lock color={color('black', 'white')}/> }
-                                        colorScheme={slot.reserved ? "red" : "green"}
+                                        colorScheme={slot.reserved ? (slot.userId === userId ? "red" : "gray") : "green"}
                                         size="sm"
+                                        isDisabled={slot.reserved && slot.userId !== userId}
                                     >
-                                        {slot.reserved ? "Cancel" : "Reserve"}
+                                         {slot.reserved ? (slot.userId === userId ? "Cancel" : "Unavailable") : "Reserve"}
                                     </Button>
                                     <Tag size="sm" colorScheme={slot.isAvailable ? "green" : "red"} borderRadius="full">
                                         <Circle className={`text-xs ${slot.isAvailable ? "" : "fill-current"}`} color={color('black', 'white')} />
@@ -134,8 +152,35 @@ const handleReserveClick = async (slot) => {
                                 </Flex>
                             </Container>
                         ))}
+                        
                     </aside>
                 </div>
+                <AlertDialog
+        isOpen={isCancelConfirmOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={() => setIsCancelConfirmOpen(false)}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Cancel Reservation
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Are you sure you want to cancel your reservation for slot {selectedSlot?.slotNumber}?
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={() => setIsCancelConfirmOpen(false)}>
+                No
+              </Button>
+              <Button colorScheme="red" onClick={cancelReservation} ml={3}>
+                Yes, Cancel
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
             </Container>
         </ChakraProvider>
     );

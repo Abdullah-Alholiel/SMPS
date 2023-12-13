@@ -3,10 +3,13 @@ import { Box, VStack, IconButton, useColorModeValue, Flex, Text, Button } from '
 import { ChevronLeftIcon, ChevronRightIcon, SettingsIcon } from '@chakra-ui/icons';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useAuth } from '../hooks/useAuth';
+import Cookies from 'universal-cookie';
 
 const Sidebar = ({ activePage, links }) => {
   const [isOpen, setIsOpen] = useState(true);
   const navigate = useNavigate();
+  const auth = useAuth();
   
   const onToggle = () => setIsOpen(!isOpen);
 
@@ -16,20 +19,18 @@ const Sidebar = ({ activePage, links }) => {
 
   const handleLogout = async () => {
     try {
-      //get Token from cookies
       const token = localStorage.getItem('token');
-      navigate("/login");
-
-      await axios.post('https://colorful-fox-hosiery.cyclic.app/users/logout' , {
+  
+      await axios.post('http://localhost:3001/users/logout', {}, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
-      // Redirect to login page after successful logout
-
+      auth.logout(); // Make sure this function clears the token from the auth context/state
+      localStorage.removeItem('token');
+      navigate("/login");
     } catch (error) {
       console.error('Logout failed:', error);
-      // Handle error (show error message, etc.)
     }
   };
 

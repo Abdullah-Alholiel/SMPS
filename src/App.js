@@ -9,8 +9,12 @@ import Cookies from "universal-cookie";
 
 const cookies = new Cookies();
 
+// Define a component to protect routes that require authentication
 const ProtectedRoute = ({ children }) => {
+  // Retrieve the authentication token from cookies
   const token = cookies.get("TOKEN");
+  // If a token exists, render the child components (allow access to the route)
+  // Otherwise, redirect the user to the login page
   return token ? children : <Navigate to="/login" />;
 };
 

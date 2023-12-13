@@ -18,7 +18,6 @@ async function updateParkingSlotStatus(slotNumber, status, userId, session) {
 }
 
 // Create a new reservation
-// Update the createReservation function in ReservationController.js to save the reservationId when creating a new reservation
 exports.createReservation = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -27,10 +26,17 @@ exports.createReservation = async (req, res) => {
         if (!userId || !slotNumber) {
             throw new Error('userId and slotNumber are required');
         }
-        const existingReservation = await Reservation.findOne({ userId, slotNumber, reservationStatus: 'active' });
-        if (existingReservation) {
-            return res.status(400).send({ error: 'User already has an active reservation for this slot' });
+        // Check if the slot is already reserved by any user
+        const slot = await ParkingSlot.findOne({ slotNumber }).session(session);
+        if (slot.status === 'reserved') {
+            throw new Error('Parking slot is already reserved');
         }
+        // Check if the user has an existing active reservation for the slot
+        const existingReservation = await Reservation.findOne({ userId, slotNumber, reservationStatus: 'active' }).session(session);
+        if (existingReservation) {
+            throw new Error('User already has an active reservation for this slot');
+        }
+        // Reserve the slot and create a new reservation
         await updateParkingSlotStatus(slotNumber, 'reserved', userId, session);
         const reservation = new Reservation({ userId, slotNumber });
         const savedReservation = await reservation.save({ session });
@@ -160,4 +166,3 @@ const reservations = await Reservation.find({}).sort({ startTime: -1 });
 };
 
 // Additional controller functions like  etc., can be added here
-

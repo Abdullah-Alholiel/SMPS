@@ -2,6 +2,7 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { hashPassword } = require('../middleware/auth');
+const cookies = require('universal-cookie');
 
 // Register a new user
 exports.register = async (req, res) => {
@@ -27,7 +28,10 @@ exports.login = async (req, res) => {
         if (!isPasswordMatch) {
             return res.status(401).send({ error: 'Login failed: incorrect password.' });
         }
+
         const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET);
+        res.cookie('TOKEN', token, { httpOnly: true });
+        res.cookie('userId', user._id, { httpOnly: true });
         res.send({ message: 'User logged in successfully', user, token });
     } catch (error) {
         res.status(400).send(error);
@@ -37,6 +41,7 @@ exports.login = async (req, res) => {
 // logout
 exports.logout = async (req, res) => {
     try {
+        res.clearCookie('TOKEN');
         req.user.tokens = req.user.tokens.filter((token) => {
             return token.token !== req.token;
         });

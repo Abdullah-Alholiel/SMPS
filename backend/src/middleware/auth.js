@@ -20,17 +20,22 @@ const comparePassword = async (providedPassword, storedPassword) => {
 // Middleware for user authentication
 const auth = async (req, res, next) => {
     try {
-        const token = req.header('Authorization').replace('Bearer ', '');
+        console.log('Authenticating user...');
+        const token = req.cookies.TOKEN;
+        console.log(`Token received: ${token}`);
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const user = await User.findOne({ _id: decoded._id });
+        console.log(`User found: ${user}`);
 
         if (!user) {
             throw new Error('User not found');
         }
 
         req.user = user;
+        req.token = token;
         next();
     } catch (error) {
+        console.log(`Authentication error: ${error}`);
         res.status(401).send({ error: 'Please authenticate.' });
     }
 };
