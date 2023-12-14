@@ -76,7 +76,7 @@ const ReservationsList = ({ userId }) => {
   useEffect(() => {
     const fetchReservations = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/reservations", {
+        const response = await axios.get("https://smps-shu.onrender.com/reservations", {
           params: { userId: userId }
         });
         setReservations(response.data);

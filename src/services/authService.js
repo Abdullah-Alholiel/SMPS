@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3001';
+const API_URL = 'https://smps-shu.onrender.com';
 const REGISTER_URL = '/users/register';
 const LOGIN_URL = '/users/login';
 

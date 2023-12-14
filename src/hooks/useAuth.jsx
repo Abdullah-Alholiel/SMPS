@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
       try {
         const token = cookies.get('TOKEN');
         if (token) {
-          const result = await axios.post('http://localhost:3001/users/logout', {
+          const result = await axios.post('https://smps-shu.onrender.com/users/logout', {
             headers: {
               Authorization: `Bearer ${token}`,
             },
