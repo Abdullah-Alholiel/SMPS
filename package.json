@@ -40,14 +40,12 @@
     "validator": "^13.11.0"
   },
   "scripts": {
-    "start": "concurrently \"npm run start --prefix backend\" \"react-scripts start\"",
+    "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "start:backend": "npm start --prefix backend",
-    "start:frontend": "react-scripts start",
-    "build:frontend": "react-scripts build"
-  },  
+    "eject": "react-scripts eject"
+  }
+  ,  
   "eslintConfig": {
     "extends": [
       "react-app",
