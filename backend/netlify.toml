@@ -15,7 +15,7 @@
 [[redirects]]
   # Redirects all requests to the main index.html file.
   from = "/*"
-  to = "/index.html"
+  to = "/server.js"
   status = 200
   # Necessary for single-page applications (SPA) to handle routing correctly.
   force = true
