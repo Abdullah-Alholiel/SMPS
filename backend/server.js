@@ -8,9 +8,9 @@ const errorHandler = require('./src/middleware/errorHandler');
 
 const app = express();
 
-// Enable CORS for your client's origin
+// Enable CORS for your client's origin and localhost 
 app.use(cors({
-  origin: 'https://spms-dissertation-shu.onrender.com',
+  origin: 'https://spms-dissertation-shu.onrender.com' && 'http://localhost:3000',
   credentials: true // Add this line to enable sending cookies with the request
 }));
 

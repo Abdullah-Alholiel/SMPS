@@ -22,6 +22,8 @@ const auth = async (req, res, next) => {
     try {
         console.log('Authenticating user...');
         const token = req.cookies.TOKEN;
+        localStorage.setItem('token', token);
+        localStorage.getItem('token');
         console.log(`Token received: ${token}`);
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const user = await User.findOne({ _id: decoded._id });
