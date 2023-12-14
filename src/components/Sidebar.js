@@ -22,6 +22,7 @@ const handleLogout = async () => {
   try {
     const cookies = new Cookies();
     const token = cookies.get('TOKEN');
+    localStorage.getItem('token');
     if (!token) {
       throw new Error('No token found');
     }
