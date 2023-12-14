@@ -15,7 +15,7 @@ router.put('/reservations/:reservationId/overstay', reservationController.handle
 router.put('/parking-slots/:slotNumber/unauthorized', reservationController.handleUnauthorizedParking);
 
 // Show all reservations and end a reservation
-router.get('/reservations', auth, reservationController.showAllReservations);
+router.get('/reservations', reservationController.showAllReservations);
 router.delete('/reservations/:reservationId', reservationController.endReservation);
 
 module.exports = router;

@@ -17,9 +17,10 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('https://colorful-fox-hosiery.cyclic.app/users/login', credentials);
+            const response = await axios.post('http://localhost:3001/users/login', credentials);
             if (response.data.token) {
                 // Store token and user ID in cookies or localStorage
+
                 cookies.set('TOKEN', response.data.token, { path: '/' });
                 cookies.set('userId', response.data.user._id, { path: '/' });
                 cookies.set('User', response.data.user, { path: '/dashboard' });

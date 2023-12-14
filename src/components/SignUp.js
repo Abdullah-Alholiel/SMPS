@@ -38,7 +38,7 @@ const SignUp = () => {
     const cookies = new Cookies();
     if (!isValid()) return;
     try {
-      const response = await axios.post('https://colorful-fox-hosiery.cyclic.app/users/register', userData);
+      const response = await axios.post('http://localhost:3001/users/register', userData);
       //save response in cookies
       cookies.set('User', response.data, { path: '/' });
       toast({ title: 'Registration successful', status: 'success', duration: 3000, isClosable: true });

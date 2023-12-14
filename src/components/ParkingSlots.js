@@ -8,7 +8,7 @@ const ParkingSlots = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('https://colorful-fox-hosiery.cyclic.app/parkingSlots');
+        const response = await axios.get('http://localhost:3001/parkingSlots');
         console.log(response.data);  
         setParkingSlots(response.data);
       } catch (error) {
@@ -29,6 +29,7 @@ const ParkingSlots = () => {
             <Th>Status</Th>
             <Th>Reservation Id</Th>
             <Th>Current Distance</Th>
+            <Th>status</Th>
             <Th>Reserved By</Th> {/* Make sure this header is present */}
             <Th>is Available</Th>
             <Th>Last Updated</Th>
@@ -41,6 +42,7 @@ const ParkingSlots = () => {
               <Td>{slot.status}</Td>
               <Td>{slot.reservationId || 'Not Reserved'}</Td>
               <Td>{slot.currentDistance}</Td>
+              <Td>{slot.status}</Td>
               <Td>{slot.userId ? slot.userId.username : 'Not Reserved'}</Td> {/* Update this line */}              <Td>{slot.isAvailable ? 'Yes' : 'No'}</Td>
               <Td>{new Date(slot.lastUpdated).toLocaleString()}</Td>
             </Tr>

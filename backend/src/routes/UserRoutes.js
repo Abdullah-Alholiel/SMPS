@@ -6,6 +6,8 @@ const router = express.Router();
 router.post('/users/register', userController.register);
 router.post('/users/login', userController.login);
 router.post('/users/updateUser', userController.updateUser); // auth to be added
+// backend/src/routes/UserRoutes.js
+router.get('/profile/:userId', userController.getProfile);
 
 // Use auth middleware for routes that require authentication
 router.post('/users/logout', auth, userController.logout);

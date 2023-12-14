@@ -35,6 +35,12 @@ const auth = async (req, res, next) => {
         req.token = token;
         next();
     } catch (error) {
+        let errorMessage = 'Please authenticate.';
+    if (error.name === 'JsonWebTokenError') {
+        errorMessage = 'Invalid token. Please log in again.';
+    } else if (error.name === 'TokenExpiredError') {
+        errorMessage = 'Token expired. Please log in again.';
+    }
         console.log(`Authentication error: ${error}`);
         res.status(401).send({ error: 'Please authenticate.' });
     }

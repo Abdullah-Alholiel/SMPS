@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
       try {
         const token = cookies.get('TOKEN');
         if (token) {
-          const result = await axios.post('https://colorful-fox-hosiery.cyclic.app/users/logout', {
+          const result = await axios.post('http://localhost:3001/users/logout', {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -30,6 +30,7 @@ export const AuthProvider = ({ children }) => {
         }
       } catch (error) {
         // Handle error
+        console.error(error);
       }
     };
 
@@ -44,7 +45,13 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     cookies.remove('TOKEN'); // Ensure path matches the one used in login
     setUser(null); // Clear user state
+  
+    // Set a timeout to navigate, to ensure all states are updated properly
+    setTimeout(() => {
+      navigate("/login");
+    }, 100);
   };
+  
 
   return (
     <AuthContext.Provider value={{ user, login, logout, message }}>

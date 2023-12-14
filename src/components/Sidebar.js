@@ -17,22 +17,33 @@ const Sidebar = ({ activePage, links }) => {
   const activeLinkColor = useColorModeValue('blue.500', 'blue.300');
   const sidebarWidth = isOpen ? '180px' : '50px';
 
-  const handleLogout = async () => {
-    try {
-      const token = localStorage.getItem('token');
-  
-      await axios.post('http://localhost:3001/users/logout', {}, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      auth.logout(); // Make sure this function clears the token from the auth context/state
-      localStorage.removeItem('token');
-      navigate("/login");
-    } catch (error) {
-      console.error('Logout failed:', error);
+// src/components/Sidebar.js
+const handleLogout = async () => {
+  try {
+    const cookies = new Cookies();
+    const token = cookies.get('TOKEN');
+    if (!token) {
+      throw new Error('No token found');
     }
-  };
+    await axios.post('http://localhost:3001/users/logout', {}, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    // Ensure auth object is not null and has a logout method
+    if (auth && auth.logout) {
+      auth.logout(); // This will now also handle the navigation
+    } else {
+      // Handle case where auth is null or logout method is not available
+      console.error('Auth object is null or logout method is not defined');
+    }
+    navigate('/login');
+  } catch (error) {
+    console.error('Logout failed:', error);
+  }
+};
+  
 
   return (
     <Box width={sidebarWidth} bg={useColorModeValue('gray.100', 'gray.900')} p={1} transition="width 0.2s">
