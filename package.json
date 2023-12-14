@@ -41,13 +41,13 @@
   },
   "scripts": {
     "start": "concurrently \"npm run start --prefix backend\" \"react-scripts start\"",
-    "build": "react-scripts",
+    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "start:backend": "npm start --prefix backend",
     "start:frontend": "react-scripts start",
     "build:frontend": "react-scripts build"
-  },
+  },  
   "eslintConfig": {
     "extends": [
       "react-app",
