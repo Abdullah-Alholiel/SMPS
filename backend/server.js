@@ -10,7 +10,7 @@ const app = express();
 
 // Enable CORS for your client's origin
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: 'https://spms-dissertation-shu.onrender.com',
   credentials: true // Add this line to enable sending cookies with the request
 }));
 
