@@ -22,11 +22,11 @@ const handleLogout = async () => {
   try {
     const cookies = new Cookies();
     const token = cookies.get('TOKEN');
-    localStorage.getItem('token');
+    localStorage.getItem('TOKEN');
     if (!token) {
       throw new Error('No token found');
     }
-    await axios.post('https://smps-shu.onrender.com/users/logout', {}, {
+    await axios.post('http://localhost:3001/users/logout', {}, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${token}`

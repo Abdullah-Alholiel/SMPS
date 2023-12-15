@@ -8,10 +8,17 @@ const errorHandler = require('./src/middleware/errorHandler');
 
 const app = express();
 
-// Enable CORS for your client's origin and localhost 
+// Replace the two app.use(cors({...})); calls with this single call
 app.use(cors({
-  origin: 'https://spms-dissertation-shu.onrender.com' || 'http://localhost:3000',
-  credentials: true // Add this line to enable sending cookies with the request
+  origin: function (origin, callback) {
+    const allowedOrigins = ['https://smps-shu.onrender.com', 'http://localhost:3000'];
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
 }));
 
 // Built-in middleware for json

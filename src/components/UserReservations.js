@@ -30,7 +30,7 @@ const getStatusColorScheme = (status) => {
   return statusColorMapping[status.toLowerCase()] || 'gray';
 };
 // Card component to display individual reservation details
-const ReservationCard = ({ reservation }) => {
+const ReservationCard = ({ reservation, onCancel }) => {
   // Define colors based on the color mode
   
   const bgColor = useColorModeValue('white', 'gray.700');
@@ -56,6 +56,11 @@ const ReservationCard = ({ reservation }) => {
         </Flex>
         <Text fontSize="sm" color="gray.500">Start Time: {formatDate(reservation.startTime)}</Text>
         <Text fontSize="sm" color="gray.500">End Time: {formatDate(reservation.endTime)}</Text>
+        {reservation.reservationStatus === 'active' && (
+        <Button colorScheme="red" onClick={() => onCancel(reservation)}>
+          Cancel Reservation
+        </Button>
+      )}
         {/* Additional reservation details or actions can be added here */}
       </VStack>
     </Box>
@@ -63,7 +68,7 @@ const ReservationCard = ({ reservation }) => {
 };
 
 // Component to list all reservations with pagination
-const ReservationsList = ({ userId }) => {
+const ReservationsList = ({ userId, onCancel }) => {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -185,6 +190,35 @@ const UserReservations = () => {
     }
   }, [toast]);
 
+  // Function to cancel a reservation
+  const cancelReservation = async (reservation, fetchReservations) => {
+    try {
+      await axios.delete(`https://smps-shu.onrender.com/reservations/${reservation._id}`, {
+        data: {
+          userId: userId,
+          slotNumber: reservation.slotNumber
+        }
+      });
+      toast({
+        title: "Reservation cancelled",
+        description: "Your reservation has been cancelled",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+      // Refresh the reservations list after cancellation
+      fetchReservations();
+    } catch (error) {
+      toast({
+        title: 'Error cancelling reservation',
+        description: error.message,
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+      });
+    }
+  };
+
   if (!userId) return <Text>Please log in to view your reservations.</Text>;
 
   return (
@@ -192,7 +226,7 @@ const UserReservations = () => {
   <Flex direction="column" align="center" justify="center" w="100%">
     <Text fontSize={{ base: "xl", md: "2xl" }} mb={5}>Your Reservations</Text>
     <Box w="100%" px={{ base: 3, md: 5 }}>
-      <ReservationsList userId={userId} />
+      <ReservationsList userId={userId} onCancel={cancelReservation} />
     </Box>
   </Flex>
 </Container>

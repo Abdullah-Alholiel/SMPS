@@ -42,11 +42,11 @@ exports.login = async (req, res) => {
 exports.logout = async (req, res) => {
     try {
         res.clearCookie('TOKEN');
-        req.user.tokens = req.user.tokens.filter((token) => {
-            return token.token !== req.token;
-        });
-        await req.user.save();
-        res.send({ message: 'Logout successful', token: req.user.token });
+        //req.user.tokens = req.user.tokens.filter((token) => {
+          //  return token.token !== req.token;
+        //});
+        //await req.user.save();
+        res.send({ message: 'Logout successful', token: req.token });
     } catch (error) {
         res.status(500).send({ error: 'Logout failed', details: error.message });
     }

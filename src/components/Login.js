@@ -7,37 +7,47 @@ import Cookies from 'universal-cookie';
 const Login = () => {
     const navigate = useNavigate();
     const toast = useToast();
-    const cookies = new Cookies();
+    const cookies = new Cookies(); // Corrected the instantiation of Cookies
     const [credentials, setCredentials] = useState({ username: '', password: '' });
 
+    // Handles changes in the input fields
     const handleChange = (e) => {
         setCredentials({ ...credentials, [e.target.name]: e.target.value });
     };
 
+    // Handles the submit action for the login form
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('https://smps-shu.onrender.com/users/login', credentials);
+            // Sending a POST request to the login endpoint
+            const response = await axios.post('http://localhost:3001/users/login', credentials);
+
             if (response.data.token) {
-                // Store token and user ID in cookies or localStorage
-
+                // Store token in cookies
                 cookies.set('TOKEN', response.data.token, { path: '/' });
-                cookies.set('userId', response.data.user._id, { path: '/' });
-                cookies.set('User', response.data.user, { path: '/dashboard' });
-                localStorage.setItem('token', response.data.token);                //localStorage.setItem('user_id', response.data.user._id);// Another way of storing user ID in localStorage
-                localStorage.user_id = response.data.user._id; // Storing user ID in localStorage
-                //another way of storing user id
+                // Store user ID in localStorage (choose one method)
+                localStorage.setItem('user_id', response.data.user._id);
 
+                // Notify the user of successful login and redirect
                 toast({ title: 'Login successful', status: 'success', duration: 3000, isClosable: true });
                 navigate('/dashboard'); // Redirect to dashboard
             } else {
+                // Notify the user of invalid credentials
                 toast({ title: 'Invalid credentials', status: 'error', duration: 3000, isClosable: true });
             }
         } catch (error) {
-            toast({ title: 'Login failed', description: error.response.data.message, status: 'error', duration: 3000, isClosable: true });
+            // Notify the user of a login failure
+            toast({ 
+                title: 'Login failed', 
+                description: error.response?.data?.message || 'An error occurred', 
+                status: 'error', 
+                duration: 3000, 
+                isClosable: true 
+            });
         }
     };
 
+    // JSX for the login form
     return (
         <Flex align="center" justify="center" h="100vh">
             <Box shadow="md" p={4} rounded="md">
