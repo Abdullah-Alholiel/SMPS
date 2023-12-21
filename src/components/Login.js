@@ -20,7 +20,7 @@ const Login = () => {
         e.preventDefault();
         try {
             // Sending a POST request to the login endpoint
-            const response = await axios.post('http://localhost:3001/users/login', credentials);
+            const response = await axios.post('https://smps-shu.onrender.com/users/login', credentials);
 
             if (response.data.token) {
                 // Store token in cookies

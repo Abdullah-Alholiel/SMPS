@@ -79,7 +79,7 @@ const SmartParkingDashboard = () => {
   // Function to fetch parking slots from the server
   const fetchParkingSlots = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/parkingSlots');
+      const response = await axios.get('https://smps-shu.onrender.com/parkingSlots');
       const updatedSlots = response.data.map(slot => ({
         ...slot,
         reserved: slot.status === 'reserved',
