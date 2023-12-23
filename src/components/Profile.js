@@ -20,12 +20,15 @@ const Profile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const cookies = new Cookies();
-        const userId = cookies.get('userId');
+        let userId = localStorage.getItem('user._id');
         if (!userId) {
-          throw new Error('User ID not found in cookies');
+          const cookies = new Cookies();
+          userId = cookies.get('userId');
+          if (!userId) {
+            throw new Error('User ID not found');
+          }
         }
-        const response = await axios.get(`https://smps-shu.onrender.com/profile/${userId}`, {
+        const response = await axios.get(`http://localhost:3001/profile/${userId}`, {
           withCredentials: true
         });
         setProfileData(response.data); // Set profile data in state
@@ -35,7 +38,6 @@ const Profile = () => {
     };
     fetchProfile();
   }, [toast]);
-
   // Handle input changes
   const handleChange = (e) => {
     setProfileData({ ...profileData, [e.target.name]: e.target.value });
@@ -46,7 +48,7 @@ const Profile = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token'); // Fetch token from local storage
-      await axios.post('https://smps-shu.onrender.com/users/updateUser', profileData, {
+      await axios.post('http://localhost:3001/users/updateUser', profileData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast({ title: 'User profile updated', status: 'success', duration: 3000, isClosable: true });

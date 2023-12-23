@@ -29,10 +29,9 @@ exports.login = async (req, res) => {
             return res.status(401).send({ error: 'Login failed: incorrect password.' });
         }
 
-        const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET);
-        res.cookie('TOKEN', token, { httpOnly: true });
-        res.cookie('userId', user._id, { httpOnly: true });
-        res.send({ message: 'User logged in successfully', user, token, role: user.role });
+        const token = jwt.sign({ _id: user._id.toString(), role: user.role }, process.env.JWT_SECRET);
+        //res.cookie('TOKEN', token, { httpOnly: true });
+        res.send({ message: 'User logged in successfully', user, token });
     } catch (error) {
         res.status(400).send(error);
     }
@@ -41,15 +40,26 @@ exports.login = async (req, res) => {
 // logout
 exports.logout = async (req, res) => {
     try {
+        const token = req.cookies.TOKEN;
+        const userId = req.cookies.userId;
+        const user = await User.findOne({ _id: userId });
+        if (!user) {
+          return res.status(401).send({ error: 'Invalid credentials' });
+        }
+        const tokenData = jwt.verify(token, process.env.JWT_SECRET);
+        if (!tokenData) {
+          return res.status(401).send({ error: 'Invalid token' });
+        }
+        const updatedUser = await User.findOneAndUpdate({ _id: userId }, { $set: { tokens: [] } }, { new: true });
+        if (!updatedUser) {
+          return res.status(401).send({ error: 'Invalid user' });
+        }
         res.clearCookie('TOKEN');
-        req.user.tokens = req.user.tokens.filter((token) => {
-            return token.token !== req.token;
-        });
-        await req.user.save();
-        res.send({ message: 'Logout successful', token: req.token });
-    } catch (error) {
-        res.status(500).send({ error: 'Logout failed', details: error.message });
-    }
+        res.clearCookie('userId');
+        res.send({ message: 'User logged out successfully' });
+      } catch (error) {
+        res.status(400).send(error);
+      }
 };
 
 

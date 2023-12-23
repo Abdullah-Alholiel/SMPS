@@ -54,6 +54,7 @@ const ReservationCard = ({ reservation, onCancel }) => {
             {reservation.reservationStatus}
           </Badge>
         </Flex>
+        <Text fontSize="sm" color="gray.500">Username: {reservation.userId.username}</Text>
         <Text fontSize="sm" color="gray.500">Start Time: {formatDate(reservation.startTime)}</Text>
         <Text fontSize="sm" color="gray.500">End Time: {formatDate(reservation.endTime)}</Text>
         {reservation.reservationStatus === 'active' && (
@@ -68,12 +69,12 @@ const ReservationCard = ({ reservation, onCancel }) => {
 };
 
 // Component to list all reservations with pagination
-const ReservationsList = ({ userId, onCancel, fetchReservations }) => {
+const ReservationsList = ({ userId, userRole, onCancel }) => {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [reservationsPerPage] = useState(3); // Show only 3 reservations per page
+  const [reservationsPerPage] = useState(3);
 
   const toast = useToast();
 
@@ -81,29 +82,26 @@ const ReservationsList = ({ userId, onCancel, fetchReservations }) => {
   useEffect(() => {
     const fetchReservations = async () => {
       try {
-        
-        const response = await axios.get("https://smps-shu.onrender.com/reservations", {
-          params: { userId: userId }
-        });
-         // Filter reservations to only include those belonging to the logged-in user
-      const userReservations = response.data.filter(reservation => reservation.userId === userId);
-      setReservations(userReservations);
+        let response;
+        const userId = localStorage.getItem("userId");
+        if (localStorage.getItem('userRole')  === 'admin') {
+          response = await axios.get("http://localhost:3001/reservations");
+        } else {
+          // Fetch reservations for the specific user when not an admin
+          response = await axios.get(`http://localhost:3001/reservations/${userId}`);
+        }
+        setReservations(response.data);
       } catch (err) {
         setError('Failed to fetch reservations');
-        toast({
-          title: "Error",
-          description: "Failed to fetch reservations",
-          status: "error",
-          duration: 9000,
-          isClosable: true,
-        });
+        console.error(err); // Log the error for debugging
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchReservations();
-  }, [userId, toast, fetchReservations]);
+  }, [userId, userRole]); // Dependencies array
+
 
   // Pagination logic
   const indexOfLastReservation = currentPage * reservationsPerPage;
@@ -175,13 +173,16 @@ const ReservationsList = ({ userId, onCancel, fetchReservations }) => {
 // Main component to manage user reservations
 const UserReservations = () => {
   const [userId, setUserId] = useState('');
+  const [userRole, setUserRole] = useState('');
   const toast = useToast();
 
-  // Effect to retrieve user ID from storage
+  // Effect to retrieve user ID and role from storage
   useEffect(() => {
-    const storedUserId = localStorage.getItem("user_id");
-    if (storedUserId) {
-      setUserId(storedUserId);
+    const userId = localStorage.getItem("userId");
+    const userRole = localStorage.getItem("userRole");
+    if (userId && userRole) {
+      setUserId(userId);
+      setUserRole(userRole);
     } else {
       toast({
         title: "Authentication Error",
@@ -196,7 +197,7 @@ const UserReservations = () => {
   // Function to cancel a reservation
   const cancelReservation = async (reservation, fetchReservations) => {
     try {
-      await axios.delete(`https://smps-shu.onrender.com/reservations/${reservation._id}`, {
+      await axios.delete(`http://localhost:3001/reservations/${reservation._id}`, {
         data: {
           userId: userId,
           slotNumber: reservation.slotNumber
@@ -222,7 +223,7 @@ const UserReservations = () => {
     }
   };
 
-  if (!userId) return <Text>Please log in to view your reservations.</Text>;
+  //if (!userRole || userRole !== "user") return <Text>Please log in to view your reservations.</Text>;
 
   return (
 <Container maxW="container.xl" p={{ base: 3, md: 5 }} centerContent>

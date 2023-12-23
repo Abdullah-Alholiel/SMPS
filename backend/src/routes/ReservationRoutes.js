@@ -16,6 +16,8 @@ router.put('/parking-slots/:slotNumber/unauthorized', reservationController.hand
 
 // Show all reservations and end a reservation
 router.get('/reservations', reservationController.showAllReservations);
+// Show reservations for a specific user
+router.get('/reservations/:userId', reservationController.showUserReservations);
 router.delete('/reservations/:reservationId', reservationController.endReservation);
 
 module.exports = router;

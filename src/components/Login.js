@@ -20,14 +20,23 @@ const Login = () => {
         e.preventDefault();
         try {
             // Sending a POST request to the login endpoint
-            const response = await axios.post('https://smps-shu.onrender.com/users/login', credentials);
+            const response = await axios.post('http://localhost:3001/users/login', credentials);
 
             if (response.data.token) {
                 // Store token in cookies
                 cookies.set('TOKEN', response.data.token, { path: '/' });
+                cookies.set('userId', response.data.user._id, { path: '/' });
+               cookies.set('userRole', response.data.user.role, { path: '/' });
                 // Store user ID in localStorage (choose one method)
-                localStorage.setItem('user_id', response.data.user._id);
+                localStorage.setItem('TOKEN', response.data.token);
+                localStorage.setItem('userId', response.data.user._id);
                 localStorage.setItem('userRole', response.data.role);
+                if (response.data.user.role === 'admin') {
+                    localStorage.setItem('userRole', response.data.user.role);
+                }
+                if (response.data.role === 'user') {
+                 localStorage.setItem('userRole', response.data.role);
+                }
                 // Notify the user of successful login and redirect
                 toast({ title: 'Login successful', status: 'success', duration: 3000, isClosable: true });
                 navigate('/dashboard'); // Redirect to dashboard

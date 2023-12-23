@@ -46,40 +46,36 @@ const SmartParkingDashboard = () => {
     setReservation((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  // Function to handle reservation form submission
-  const handleSubmit = async () => {
-    setIsSubmitting(true);
-    const startTime = new Date();
-    const endTime = new Date(startTime.getTime() + (reservation.duration * 60000));
+// Function to handle reservation form submission
+const handleSubmit = async () => {
+  setIsSubmitting(true);
 
-    try {
-      const response = await axios.post(
-        "https://smps-shu.onrender.com/reservations/createreservation",
-        {
-          userId: localStorage.getItem("user_id"),
-          slotNumber: parseInt(reservation.slotId),
-          startTime: startTime.toISOString(),
-          endTime: endTime.toISOString(),
-        }
-      );
+  try {
+    const response = await axios.post(
+      "http://localhost:3001/reservations/createreservation",
+      {
+        userId: localStorage.getItem("user_id"),
+        slotNumber: parseInt(reservation.slotId),
+        duration: parseInt(reservation.duration), // Include duration in the request
+      }
+    );
 
-      setMessage("Reservation created successfully");
-      setIsReservationFormOpen(false);
-      fetchParkingSlots(); // Refresh the slots after successful reservation
-      // If there's a callback to handle reservation success, call it here
-      // onReservationSuccess(response.data);
-    } catch (error) {
-      const errorMessage = error.response ? error.response.data.error : error.message;
-      setMessage(`Error: ${errorMessage}`);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    setMessage("Reservation created successfully");
+    setIsReservationFormOpen(false);
+    fetchParkingSlots(); // Refresh the slots after successful reservation
+  } catch (error) {
+    const errorMessage = error.response ? error.response.data.error : error.message;
+    setMessage(`Error: ${errorMessage}`);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   // Function to fetch parking slots from the server
   const fetchParkingSlots = async () => {
     try {
-      const response = await axios.get('https://smps-shu.onrender.com/parkingSlots');
+      const response = await axios.get('http://localhost:3001/parkingSlots');
       const updatedSlots = response.data.map(slot => ({
         ...slot,
         reserved: slot.status === 'reserved',
@@ -127,7 +123,7 @@ const SmartParkingDashboard = () => {
   // Function to cancel a reservation
   const cancelReservation = async () => {
     try {
-      await axios.delete(`https://smps-shu.onrender.com/reservations/${selectedSlot.reservationId}`, {
+      await axios.delete(`http://localhost:3001/reservations/${selectedSlot.reservationId}`, {
         data: {
           userId: userId,
           slotNumber: selectedSlot.slotNumber

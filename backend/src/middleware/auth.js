@@ -39,11 +39,7 @@ const auth = async (req, res, next) => {
         req.user = user;
         req.token = token;
         req.role = user.role;
-
-        // Add role check
-    if (!req.user.role || req.user.role !== 'admin') {
-        return res.status(403).send({ error: 'Access denied' });
-    }
+        console.log(`User authenticated: ${user.username}`);
         next();
     } catch (error) {
         let errorMessage = 'Please authenticate.';

@@ -22,27 +22,35 @@ exports.createReservation = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-        const { userId, slotNumber } = req.body;
-        if (!userId || !slotNumber) {
-            throw new Error('userId and slotNumber are required');
+        const { userId, slotNumber, duration } = req.body;
+        if (!userId || !slotNumber || !duration) {
+            throw new Error('userId, slotNumber, and duration are required');
         }
-        // Check if the slot is already reserved by any user
+
+        // Convert duration to integer and calculate end time
+        const durationInMinutes = parseInt(duration);
+        const startTime = new Date();
+        const endTime = new Date(startTime.getTime() + durationInMinutes * 60000);
+
+        // Check if the slot is already reserved
         const slot = await ParkingSlot.findOne({ slotNumber }).session(session);
         if (slot.status === 'reserved') {
             throw new Error('Parking slot is already reserved');
         }
-        // Check if the user has an existing active reservation for the slot
+
+        // Check for existing active reservation
         const existingReservation = await Reservation.findOne({ userId, slotNumber, reservationStatus: 'active' }).session(session);
         if (existingReservation) {
             throw new Error('User already has an active reservation for this slot');
         }
+
         // Reserve the slot and create a new reservation
         await updateParkingSlotStatus(slotNumber, 'reserved', userId, session);
-        const reservation = new Reservation({ userId, slotNumber });
+        const reservation = new Reservation({ userId, slotNumber, startTime, endTime });
         const savedReservation = await reservation.save({ session });
-        const reservationId = savedReservation._id;
+
         await session.commitTransaction();
-        res.status(201).send({ message: 'Reservation created successfully', reservation: savedReservation, reservationId });
+        res.status(201).send({ message: 'Reservation created successfully', reservation: savedReservation });
     } catch (error) {
         await session.abortTransaction();
         res.status(400).send({ error: error.message });
@@ -148,9 +156,10 @@ exports.handleUnauthorizedParking = async (req, res) => {
 exports.showAllReservations = async (req, res) => {
     try {
         // Fetch all reservations from the database
-// Sorting by startTime in descending order (most recent first)
-const reservations = await Reservation.find({}).sort({ startTime: -1 });
-        
+const reservations = await Reservation.find({})
+.sort({ startTime: -1 })// Sorting by startTime in descending order (most recent first)
+.populate('userId', 'username'); // Populate with username
+
 
         // Check if reservations exist
         if (!reservations || reservations.length === 0) {
@@ -164,5 +173,31 @@ const reservations = await Reservation.find({}).sort({ startTime: -1 });
         res.status(500).send({ error: 'Error fetching reservations', details: error.message });
     }
 };
+
+// Function to show reservations for a specific user
+// Assuming Reservation model has a reference to User model as 'userId'
+exports.showUserReservations = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const reservations = await Reservation.find({ userId })
+            .sort({ startTime: -1 })
+            .populate('userId', 'username'); // Populate username from User model
+
+        if (!reservations || reservations.length === 0) {
+            return res.status(404).send({ message: 'No reservations found for this user' });
+        }
+
+        // Map over reservations to include username in the response
+        const reservationsWithUsername = reservations.map(reservation => ({
+            ...reservation.toObject(),
+            username: reservation.userId.username
+        }));
+
+        res.status(200).send(reservationsWithUsername);
+    } catch (error) {
+        res.status(500).send({ error: 'Error fetching reservations for user', details: error.message });
+    }
+};
+
 
 // Additional controller functions like  etc., can be added here

@@ -21,33 +21,42 @@ const Sidebar = ({ activePage, links }) => {
     try {
       const cookies = new Cookies();
       const token = cookies.get('TOKEN');
-      // localStorage.getItem('TOKEN');
+      
+  
       if (!token) {
         throw new Error('No token found');
       }
-      if (!auth) {
-        // Redirect to login page if auth is null
-        navigate('/login');
-        return;
-      }
-      const user = await auth.getUser();
-      if (!user.role.includes('admin')) {
-        // Redirect to login page if user is not an admin
-        navigate('/login');
-        return;
-      }
-      await axios.post('https://smps-shu.onrender.com/users/logout', {}, {
+  
+      await axios.post('http://localhost:3001/users/logout', {}, {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
+  
+      // Clear cookies and local storage
+      localStorage.removeItem('TOKEN');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('userRole');
       cookies.remove('TOKEN');
+      cookies.remove('userId');
+      cookies.remove('userRole');
+  
+      // Update auth state
+      if (auth && auth.setUser) {
+
+      // Navigate to login or home page
+
+
+        auth.setUser(null);
+      }
+  
       navigate('/login');
     } catch (error) {
       console.error('Logout failed:', error);
     }
   };
+  
   
 
   return (
