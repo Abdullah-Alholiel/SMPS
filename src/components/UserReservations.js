@@ -68,7 +68,7 @@ const ReservationCard = ({ reservation, onCancel }) => {
 };
 
 // Component to list all reservations with pagination
-const ReservationsList = ({ userId, onCancel }) => {
+const ReservationsList = ({ userId, onCancel, fetchReservations }) => {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -81,10 +81,13 @@ const ReservationsList = ({ userId, onCancel }) => {
   useEffect(() => {
     const fetchReservations = async () => {
       try {
+        
         const response = await axios.get("https://smps-shu.onrender.com/reservations", {
           params: { userId: userId }
         });
-        setReservations(response.data);
+         // Filter reservations to only include those belonging to the logged-in user
+      const userReservations = response.data.filter(reservation => reservation.userId === userId);
+      setReservations(userReservations);
       } catch (err) {
         setError('Failed to fetch reservations');
         toast({
@@ -100,7 +103,7 @@ const ReservationsList = ({ userId, onCancel }) => {
     };
 
     fetchReservations();
-  }, [userId, toast]);
+  }, [userId, toast, fetchReservations]);
 
   // Pagination logic
   const indexOfLastReservation = currentPage * reservationsPerPage;
@@ -131,7 +134,7 @@ const ReservationsList = ({ userId, onCancel }) => {
     <Box>
       <SimpleGrid columns={1} spacing={5}>
         {currentReservations.map((reservation) => (
-          <ReservationCard key={reservation._id} reservation={reservation} />
+          <ReservationCard key={reservation._id} reservation={reservation} onCancel={onCancel} />
         ))}
       </SimpleGrid>
       {totalPageNumbers > 1 && (

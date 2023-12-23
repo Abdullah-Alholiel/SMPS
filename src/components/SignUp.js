@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { Box, FormControl, FormLabel, Input, Button, useToast } from '@chakra-ui/react';
+import { Box, FormControl, FormLabel, Input, Button, useToast, VStack, Center } from '@chakra-ui/react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'universal-cookie';
+import useResponsive from '../hooks/useResponsive';
 
 const SignUp = () => {
   const navigate = useNavigate();
   const toast = useToast();
+  const { isTabletOrMobile } = useResponsive();
   const [userData, setUserData] = useState({
     username: '',
     email: '',
@@ -49,34 +51,45 @@ const SignUp = () => {
   };
 
   return (
-    <Box my={8} textAlign="left">
-      <form onSubmit={handleSubmit}>
-        {/* Form fields with Chakra UI */}
-        <FormControl isRequired>
-          <FormLabel>Username</FormLabel>
-          <Input type="text" name="username" onChange={handleChange} />
-        </FormControl>
-        <FormControl isRequired mt={4}>
-          <FormLabel>Email</FormLabel>
-          <Input type="email" name="email" onChange={handleChange} />
-        </FormControl>
-        <FormControl isRequired mt={4}>
-          <FormLabel>Phone Number</FormLabel>
-          <Input type="text" name="phoneNumber" onChange={handleChange} />
-        </FormControl>
-        <FormControl isRequired mt={4}>
-          <FormLabel>Password</FormLabel>
-          <Input type="password" name="password" onChange={handleChange} />
-        </FormControl>
-        <FormControl isRequired mt={4}>
-          <FormLabel>Confirm Password</FormLabel>
-          <Input type="password" name="confirmPassword" onChange={handleChange} />
-        </FormControl>
-        <Button width="full" mt={4} type="submit" colorScheme="blue">
-          Sign Up
-        </Button>
-      </form>
-    </Box>
+    <Center py={8}>
+      <Box
+        w={isTabletOrMobile ? '90%' : '500px'}
+        p={8}
+        boxShadow="lg"
+        borderRadius="lg"
+        bg="white"
+        textAlign="left"
+      >
+        <form onSubmit={handleSubmit}>
+          <VStack spacing={4}>
+            {/* Form fields with Chakra UI */}
+            <FormControl isRequired>
+              <FormLabel>Username</FormLabel>
+              <Input type="text" name="username" onChange={handleChange} />
+            </FormControl>
+            <FormControl isRequired>
+              <FormLabel>Email</FormLabel>
+              <Input type="email" name="email" onChange={handleChange} />
+            </FormControl>
+            <FormControl isRequired>
+              <FormLabel>Phone Number</FormLabel>
+              <Input type="text" name="phoneNumber" onChange={handleChange} />
+            </FormControl>
+            <FormControl isRequired>
+              <FormLabel>Password</FormLabel>
+              <Input type="password" name="password" onChange={handleChange} />
+            </FormControl>
+            <FormControl isRequired>
+              <FormLabel>Confirm Password</FormLabel>
+              <Input type="password" name="confirmPassword" onChange={handleChange} />
+            </FormControl>
+            <Button width="full" mt={4} type="submit" colorScheme="blue">
+              Sign Up
+            </Button>
+          </VStack>
+        </form>
+      </Box>
+    </Center>
   );
 };
 

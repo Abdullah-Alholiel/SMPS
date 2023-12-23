@@ -50,7 +50,7 @@ const SmartParkingDashboard = () => {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     const startTime = new Date();
-    const endTime = new Date(startTime.getTime() + reservation.duration * 60000);
+    const endTime = new Date(startTime.getTime() + (reservation.duration * 60000));
 
     try {
       const response = await axios.post(

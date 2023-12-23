@@ -3,6 +3,9 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
+const cookieParser = require('cookie-parser');
+const localStorage = require('localStorage');
+
 
 const app = express.Router();
 
@@ -22,7 +25,7 @@ const auth = async (req, res, next) => {
     try {
         console.log('Authenticating user...');
         const token = req.cookies.TOKEN;
-        localStorage.setItem('TOKEN', token);
+        //localStorage.setItem('TOKEN', token);
         localStorage.getItem('TOKEN');
         console.log(`Token received: ${token}`);
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -35,6 +38,12 @@ const auth = async (req, res, next) => {
 
         req.user = user;
         req.token = token;
+        req.role = user.role;
+
+        // Add role check
+    if (!req.user.role || req.user.role !== 'admin') {
+        return res.status(403).send({ error: 'Access denied' });
+    }
         next();
     } catch (error) {
         let errorMessage = 'Please authenticate.';

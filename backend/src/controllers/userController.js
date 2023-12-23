@@ -32,7 +32,7 @@ exports.login = async (req, res) => {
         const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET);
         res.cookie('TOKEN', token, { httpOnly: true });
         res.cookie('userId', user._id, { httpOnly: true });
-        res.send({ message: 'User logged in successfully', user, token });
+        res.send({ message: 'User logged in successfully', user, token, role: user.role });
     } catch (error) {
         res.status(400).send(error);
     }
@@ -42,10 +42,10 @@ exports.login = async (req, res) => {
 exports.logout = async (req, res) => {
     try {
         res.clearCookie('TOKEN');
-        //req.user.tokens = req.user.tokens.filter((token) => {
-          //  return token.token !== req.token;
-        //});
-        //await req.user.save();
+        req.user.tokens = req.user.tokens.filter((token) => {
+            return token.token !== req.token;
+        });
+        await req.user.save();
         res.send({ message: 'Logout successful', token: req.token });
     } catch (error) {
         res.status(500).send({ error: 'Logout failed', details: error.message });

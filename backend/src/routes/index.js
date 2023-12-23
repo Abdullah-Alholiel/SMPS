@@ -17,6 +17,10 @@ router.use(parkingSlotRoutes);
 const ReservatiouRoutes = require('./ReservationRoutes');
 router.use(ReservatiouRoutes);
 
+ 
+ const adminRoutes = require('./adminRoutes');
+ router.use(adminRoutes);
+
 
 
 module.exports = router;

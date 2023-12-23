@@ -18,6 +18,7 @@ export const AuthProvider = ({ children }) => {
       // Check if the user is already logged in
       try {
         const token = cookies.get('TOKEN');
+        
         if (token) {
           const result = await axios.post('https://smps-shu.onrender.com/users/logout', {
             headers: {

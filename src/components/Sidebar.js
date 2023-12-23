@@ -17,33 +17,38 @@ const Sidebar = ({ activePage, links }) => {
   const activeLinkColor = useColorModeValue('blue.500', 'blue.300');
   const sidebarWidth = isOpen ? '180px' : '50px';
 
-// src/components/Sidebar.js
-const handleLogout = async () => {
-  try {
-    const cookies = new Cookies();
-    const token = cookies.get('TOKEN');
-    localStorage.getItem('TOKEN');
-    if (!token) {
-      throw new Error('No token found');
-    }
-    await axios.post('https://smps-shu.onrender.com/users/logout', {}, {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${token}`
+  const handleLogout = async () => {
+    try {
+      const cookies = new Cookies();
+      const token = cookies.get('TOKEN');
+      // localStorage.getItem('TOKEN');
+      if (!token) {
+        throw new Error('No token found');
       }
-    });
-    // Ensure auth object is not null and has a logout method
-    if (auth && auth.logout) {
-      auth.logout(); // This will now also handle the navigation
-    } else {
-      // Handle case where auth is null or logout method is not available
-      console.error('Auth object is null or logout method is not defined');
+      const auth = useAuth();
+      if (!auth) {
+        // Redirect to login page if auth is null
+        navigate('/login');
+        return;
+      }
+      const user = await auth.getUser();
+      if (!user.role.includes('admin')) {
+        // Redirect to login page if user is not an admin
+        navigate('/login');
+        return;
+      }
+      await axios.post('https://smps-shu.onrender.com/users/logout', {}, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      cookies.remove('TOKEN');
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
     }
-    navigate('/login');
-  } catch (error) {
-    console.error('Logout failed:', error);
-  }
-};
+  };
   
 
   return (

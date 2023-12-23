@@ -15,13 +15,16 @@ const DashboardLayout = () => {
   const navigate = useNavigate();
   const auth = useAuth();
   const { isDesktopOrLaptop } = useResponsive(); // Use the useResponsive hook
+  const userRole = localStorage.getItem('userRole'); // Retrieve the user role from localStorage
 
   const links = [
     { path: '/dashboard', icon: FaChartBar, label: 'Dashboard', onClick: () => navigate('/dashboard') },
     { path: '/dashboard/profile', icon: FaUserCircle, label: 'Profile', onClick: () => navigate('/dashboard/profile') },
-    { path: '/dashboard/parking-slots', icon: FaParking, label: 'Parking Slots', onClick: () => navigate('/dashboard/parking-slots') },
+    // Conditionally render the Parking Slots link for admin users only
+    userRole === 'admin' && { path: '/dashboard/parking-slots', icon: FaParking, label: 'Parking Slots', onClick: () => navigate('/dashboard/parking-slots') },
     { path: '/dashboard/reservations', icon: FaRegRegistered, label: 'Reservations', onClick: () => navigate('/dashboard/reservations') },
-  ];
+  ].filter(Boolean); // Filter out any falsy values (e.g., if userRole is not 'admin')
+
 
   // The sidebar is always included but its visibility can be toggled on mobile devices
   return (

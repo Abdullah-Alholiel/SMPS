@@ -27,7 +27,7 @@ const Login = () => {
                 cookies.set('TOKEN', response.data.token, { path: '/' });
                 // Store user ID in localStorage (choose one method)
                 localStorage.setItem('user_id', response.data.user._id);
-
+                localStorage.setItem('userRole', response.data.role);
                 // Notify the user of successful login and redirect
                 toast({ title: 'Login successful', status: 'success', duration: 3000, isClosable: true });
                 navigate('/dashboard'); // Redirect to dashboard
