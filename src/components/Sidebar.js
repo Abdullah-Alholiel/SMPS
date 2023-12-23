@@ -25,7 +25,6 @@ const Sidebar = ({ activePage, links }) => {
       if (!token) {
         throw new Error('No token found');
       }
-      const auth = useAuth();
       if (!auth) {
         // Redirect to login page if auth is null
         navigate('/login');
