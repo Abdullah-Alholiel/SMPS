@@ -72,7 +72,7 @@ const SmartParkingDashboard = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3001/api/reservations/createreservation",
+        "https://smps-shu.onrender.com/api/reservations/createreservation",
         {
           userId: localStorage.getItem("user_id"),
           slotNumber: parseInt(reservation.slotId),
@@ -97,7 +97,7 @@ const SmartParkingDashboard = () => {
   // Function to fetch parking slots from the server
   const fetchParkingSlots = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/api/parkingSlots");
+      const response = await axios.get("https://smps-shu.onrender.com/api/parkingSlots");
       const updatedSlots = response.data.map((slot) => ({
         ...slot,
         reserved: slot.status === "reserved",
@@ -157,7 +157,7 @@ const SmartParkingDashboard = () => {
   const cancelReservation = async () => {
     try {
       await axios.delete(
-        `http://localhost:3001/api/reservations/${selectedSlot.reservationId}`,
+        `https://smps-shu.onrender.com/api/reservations/${selectedSlot.reservationId}`,
         {
           data: {
             userId: userId,

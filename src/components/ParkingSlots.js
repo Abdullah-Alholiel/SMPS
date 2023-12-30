@@ -8,7 +8,7 @@ const ParkingSlots = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/api/parkingSlots');
+        const response = await axios.get('https://smps-shu.onrender.com/api/parkingSlots');
         console.log(response.data);  
         setParkingSlots(response.data);
       } catch (error) {

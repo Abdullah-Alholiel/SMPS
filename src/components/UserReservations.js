@@ -86,10 +86,10 @@ const ReservationsList = ({ userId, userRole, onCancel }) => {
         let response;
         const userId = localStorage.getItem("userId");
         if (localStorage.getItem('userRole')  === 'admin') {
-          response = await axios.get("http://localhost:3001/api/reservations");
+          response = await axios.get("https://smps-shu.onrender.com/api/reservations");
         } else {
           // Fetch reservations for the specific user when not an admin
-          response = await axios.get(`http://localhost:3001/api/reservations/${userId}`);
+          response = await axios.get(`https://smps-shu.onrender.com/api/reservations/${userId}`);
         }
         setReservations(response.data);
       } catch (err) {
@@ -198,7 +198,7 @@ const UserReservations = () => {
   // Function to cancel a reservation
   const cancelReservation = async (reservation, fetchReservations) => {
     try {
-      await axios.delete(`http://localhost:3001/api/reservations/${reservation._id}`, {
+      await axios.delete(`https://smps-shu.onrender.com/api/reservations/${reservation._id}`, {
         data: {
           userId: reservation.userId._id,
           slotNumber: reservation.slotNumber

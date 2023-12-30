@@ -14,7 +14,7 @@ const IoTEmulator = () => {
   useEffect(() => {
     const fetchParkingSlots = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/api/parkingSlots');
+        const response = await axios.get('https://smps-shu.onrender.com/api/parkingSlots');
         const updatedSlots = response.data.map(slot => ({
           ...slot,
           reserved: slot.status === 'reserved',
@@ -49,7 +49,7 @@ const IoTEmulator = () => {
   const handleUpdateDistance = async (index) => {
     try {
       const slot = parkingSlots[index];
-      await axios.put(`http://localhost:3001/api/parkingSlots/${slot.slotNumber}`, {
+      await axios.put(`https://smps-shu.onrender.com/api/parkingSlots/${slot.slotNumber}`, {
         slotNumber: slot.slotNumber,
         currentDistance: slot.currentDistance,
         status: slot.currentDistance < 150 ? 'occupied' : 'available',

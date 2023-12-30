@@ -27,7 +27,7 @@ const Sidebar = ({ activePage, links }) => {
         throw new Error('No token found');
       }
   
-      await axios.post('http://localhost:3001/api/users/logout', {}, {
+      await axios.post('https://smps-shu.onrender.com/api/users/logout', {}, {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${token}`

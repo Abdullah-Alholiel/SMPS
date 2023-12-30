@@ -28,7 +28,7 @@ const Profile = () => {
             throw new Error('User ID not found');
           }
         }
-        const response = await axios.get(`http://localhost:3001/api/profile/${userId}`, {
+        const response = await axios.get(`https://smps-shu.onrender.com/api/profile/${userId}`, {
           withCredentials: true
         });
         setProfileData(response.data); // Set profile data in state
@@ -48,7 +48,7 @@ const Profile = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token'); // Fetch token from local storage
-      await axios.post('http://localhost:3001/api/users/updateUser', profileData, {
+      await axios.post('https://smps-shu.onrender.com/api/users/updateUser', profileData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast({ title: 'User profile updated', status: 'success', duration: 3000, isClosable: true });
