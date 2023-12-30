@@ -1,15 +1,17 @@
 import React from 'react';
 import { Routes, Route, useNavigate, Outlet } from 'react-router-dom';
 import { Flex, Box, Heading } from '@chakra-ui/react';
-import { FaParking, FaChartBar, FaUserCircle, FaRegRegistered } from 'react-icons/fa';
+import { FaHome, FaUser, FaCar, FaCalendarAlt, FaMicrochip, FaSignOutAlt } from "react-icons/fa";
 
 import Sidebar from '../components/Sidebar';
 import SmartParkingDashboard from '../components/Dashboard';
 import ParkingSlots from '../components/ParkingSlots';
 import UserReservations from '../components/UserReservations';
 import Profile from '../components/Profile';
+import IoTEmulator from '../components/IoTEmulator';
 import { useAuth } from '../hooks/useAuth';
 import useResponsive from '../hooks/useResponsive'; // Import useResponsive hook
+
 
 const DashboardLayout = () => {
   const navigate = useNavigate();
@@ -18,12 +20,12 @@ const DashboardLayout = () => {
   const userRole = localStorage.getItem('userRole'); // Retrieve the user role from localStorage
 
   const links = [
-    { path: '/dashboard', icon: FaChartBar, label: 'Dashboard', onClick: () => navigate('/dashboard') },
-    { path: '/dashboard/profile', icon: FaUserCircle, label: 'Profile', onClick: () => navigate('/dashboard/profile') },
+    { path: '/dashboard', icon: FaHome, label: 'Dashboard', onClick: () => navigate('/dashboard') },
+    { path: '/dashboard/profile', icon: FaUser, label: 'Profile', onClick: () => navigate('/dashboard/profile') },
     // Conditionally render the Parking Slots link for admin users only
-    userRole === 'admin' && { path: '/dashboard/parking-slots', icon: FaParking, label: 'Parking Slots', onClick: () => navigate('/dashboard/parking-slots') },
-    { path: '/dashboard/reservations', icon: FaRegRegistered, label: 'Reservations', onClick: () => navigate('/dashboard/reservations') },
-  ].filter(Boolean); // Filter out any falsy values (e.g., if userRole is not 'admin')
+    userRole === 'admin' && { path: '/dashboard/parking-slots', icon: FaCar, label: 'Parking Slots', onClick: () => navigate('/dashboard/parking-slots') },
+    { path: '/dashboard/reservations', icon: FaCalendarAlt, label: 'Reservations', onClick: () => navigate('/dashboard/reservations') }, 
+    { path: '/dashboard/IoTEmulator', icon: FaMicrochip, label: 'IoT Emulator', onClick: () => navigate('/dashboard/IoTEmulator') }].filter(Boolean); // Filter out any falsy values (e.g., if userRole is not 'admin')
 
 
   // The sidebar is always included but its visibility can be toggled on mobile devices
@@ -46,6 +48,7 @@ const Dashboard = () => {
         <Route path="profile" element={<Profile />} />
         <Route path="parking-slots" element={<ParkingSlots />} />
         <Route path="reservations" element={<UserReservations />} />
+        <Route path="IoTEmulator" element={<IoTEmulator />} />
         {/* Add other nested routes as needed */}
       </Route>
     </Routes>

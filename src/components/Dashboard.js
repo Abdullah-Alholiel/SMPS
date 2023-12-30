@@ -1,15 +1,30 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import {
-  VStack, Flex, HStack, Text, Button, Tag, Circle, useToast, useColorMode, Container,
-  AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, FormControl,
+  VStack,
+  Flex,
+  HStack,
+  Text,
+  Button,
+  Tag,
+  Circle,
+  useToast,
+  useColorMode,
+  Container,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+  FormControl,
   FormLabel,
   Input,
-  Select
-} from '@chakra-ui/react';
-import { Clock, MapPin, Car, Unlock, Lock } from 'lucide-react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { ChakraProvider } from '@chakra-ui/react';
+  Select,
+} from "@chakra-ui/react";
+import { Clock, MapPin, Car, Unlock, Lock } from "lucide-react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { ChakraProvider } from "@chakra-ui/react";
 
 const SmartParkingDashboard = () => {
   // Hooks for managing state and side effects
@@ -19,9 +34,9 @@ const SmartParkingDashboard = () => {
   const [parkingSlots, setParkingSlots] = useState([]);
   const [isCancelConfirmOpen, setIsCancelConfirmOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
+  const [cancelDisabled, setCancelDisabled] = useState(false);
   const cancelRef = useRef();
-  const userId = localStorage.getItem('user_id'); // Retrieve the current user's ID from local storage
-
+  const userId = localStorage.getItem("user_id"); // Retrieve the current user's ID from local storage
 
   //reservation form state
   const [isReservationFormOpen, setIsReservationFormOpen] = useState(false);
@@ -37,7 +52,10 @@ const SmartParkingDashboard = () => {
     fetchParkingSlots();
   }, []);
   const openReservationForm = (slot) => {
-    setReservation((prevState) => ({ ...prevState, slotId: slot.slotNumber.toString() }));
+    setReservation((prevState) => ({
+      ...prevState,
+      slotId: slot.slotNumber.toString(),
+    }));
     setIsReservationFormOpen(true);
   };
   // Function to handle input change for reservation form
@@ -46,48 +64,60 @@ const SmartParkingDashboard = () => {
     setReservation((prevState) => ({ ...prevState, [name]: value }));
   };
 
-// Function to handle reservation form submission
-const handleSubmit = async () => {
-  setIsSubmitting(true);
+  // Function to handle reservation form submission
+  // Function to handle reservation form submission
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    setCancelDisabled(true); // Disable the cancel button while the reservation is being created
 
-  try {
-    const response = await axios.post(
-      "http://localhost:3001/reservations/createreservation",
-      {
-        userId: localStorage.getItem("user_id"),
-        slotNumber: parseInt(reservation.slotId),
-        duration: parseInt(reservation.duration), // Include duration in the request
-      }
-    );
+    try {
+      const response = await axios.post(
+        "http://localhost:3001/api/reservations/createreservation",
+        {
+          userId: localStorage.getItem("user_id"),
+          slotNumber: parseInt(reservation.slotId),
+          duration: parseInt(reservation.duration), // Include duration in the request
+        }
+      );
 
-    setMessage("Reservation created successfully");
-    setIsReservationFormOpen(false);
-    fetchParkingSlots(); // Refresh the slots after successful reservation
-  } catch (error) {
-    const errorMessage = error.response ? error.response.data.error : error.message;
-    setMessage(`Error: ${errorMessage}`);
-  } finally {
-    setIsSubmitting(false);
-  }
-};
-
+      setMessage("Reservation created successfully");
+      setIsReservationFormOpen(false);
+      fetchParkingSlots(); // Refresh the slots after successful reservation
+    } catch (error) {
+      const errorMessage = error.response
+        ? error.response.data.error
+        : error.message;
+      setMessage(`Error: ${errorMessage}`);
+    } finally {
+      setIsSubmitting(false);
+      setCancelDisabled(false); // Enable the cancel button after the reservation is created or an error occurs
+    }
+  };
 
   // Function to fetch parking slots from the server
   const fetchParkingSlots = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/parkingSlots');
-      const updatedSlots = response.data.map(slot => ({
+      const response = await axios.get("http://localhost:3001/api/parkingSlots");
+      const updatedSlots = response.data.map((slot) => ({
         ...slot,
-        reserved: slot.status === 'reserved',
+        reserved: slot.status === "reserved",
         reservationId: slot.reservationId || null,
-        userId: slot.userId ? slot.userId._id : null
+        userId: slot.userId ? slot.userId._id : null,
       }));
+      const currentReservation = updatedSlots.find(
+        (slot) => slot.reservationId === selectedSlot?.reservationId
+      );
       setParkingSlots(updatedSlots);
+      if (currentReservation) {
+        setSelectedSlot(currentReservation);
+      } else {
+        setSelectedSlot(null); // Add this line to reset the selectedSlot if it's no longer reserved
+      }
     } catch (error) {
       toast({
-        title: 'Error fetching parking slots',
+        title: "Error fetching parking slots",
         description: error.message,
-        status: 'error',
+        status: "error",
         duration: 9000,
         isClosable: true,
       });
@@ -104,7 +134,7 @@ const handleSubmit = async () => {
       setSelectedSlot(slot);
       setIsCancelConfirmOpen(true);
     } else if (slot.reserved) {
-      // Show a message if the slot is reserved by another user
+      // Keep as unavailable if the slot is reserved by another user
       toast({
         title: "Slot unavailable",
         description: "This parking slot is reserved by another user.",
@@ -114,21 +144,27 @@ const handleSubmit = async () => {
       });
     } else {
       // Navigate to the reservation form if the slot is not reserved
-      //navigate(`/dashboard/reservations`, { state: { slotNumber: slot.slotNumber } });
-      openReservationForm(slot);
-
+      setReservation((prevState) => ({
+        ...prevState,
+        slotId: slot.slotNumber.toString(),
+      }));
+      setIsReservationFormOpen(true); // Open the reservation form
+      setCancelDisabled(false); // Enable the cancel button if the user opens the reservation form
     }
   };
 
   // Function to cancel a reservation
   const cancelReservation = async () => {
     try {
-      await axios.delete(`http://localhost:3001/reservations/${selectedSlot.reservationId}`, {
-        data: {
-          userId: userId,
-          slotNumber: selectedSlot.slotNumber
+      await axios.delete(
+        `http://localhost:3001/api/reservations/${selectedSlot.reservationId}`,
+        {
+          data: {
+            userId: userId,
+            slotNumber: selectedSlot.slotNumber,
+          },
         }
-      });
+      );
       toast({
         title: "Reservation cancelled",
         description: "Your reservation has been cancelled",
@@ -139,14 +175,15 @@ const handleSubmit = async () => {
       fetchParkingSlots(); // Refresh the slots after cancellation
     } catch (error) {
       toast({
-        title: 'Error cancelling reservation',
+        title: "Error cancelling reservation",
         description: error.message,
-        status: 'error',
+        status: "error",
         duration: 9000,
         isClosable: true,
       });
     } finally {
       setIsCancelConfirmOpen(false); // Close the confirmation dialog
+      setCancelDisabled(false); // Enable the cancel button after the reservation is cancelled
     }
   };
   // Helper function to determine button color
@@ -157,58 +194,114 @@ const handleSubmit = async () => {
       <Container maxW="container.xl" p={0} m={0}>
         <div className="dashboard-container">
           <header className="dashboard-header">
-            <Flex alignItems="center" justifyContent="space-between" w="full" bg={color('white', 'gray.800')} color={color('black', 'white')}>
+            <Flex
+              alignItems="center"
+              justifyContent="space-between"
+              w="full"
+              bg={color("white", "gray.800")}
+              color={color("black", "white")}
+            >
               <VStack alignItems="start">
                 <HStack>
-                  <Text fontWeight="bold" color={color('black', 'white')}>Reservations</Text>
+                  <Text fontWeight="bold" color={color("black", "white")}>
+                    Reservations
+                  </Text>
                 </HStack>
                 <HStack>
-                  <Clock className="text-xl" color={color('black', 'white')} />
-                  <Text color={color('black', 'white')}>{new Date().toLocaleTimeString()}</Text>
+                  <Clock className="text-xl" color={color("black", "white")} />
+                  <Text color={color("black", "white")}>
+                    {new Date().toLocaleTimeString()}
+                  </Text>
                 </HStack>
               </VStack>
-              <MapPin className="text-3xl" color={color('black', 'white')} />
+              <MapPin className="text-3xl" color={color("black", "white")} />
             </Flex>
           </header>
           <aside className="dashboard-menu">
             {parkingSlots.map((slot) => (
-              <Container maxW="container.xl" p={0} m={0} key={slot._id} className="dashboard-menu-item">
-                <Flex key={slot._id} justifyContent="space-between" alignItems="center" w="full" p={4} borderWidth="1px" borderColor={color('gray.200', 'gray.600')} borderRadius="md" mb={2} bg={color('white', 'gray.700')} color={color('black', 'white')}>
+              <Container
+                maxW="container.xl"
+                p={0}
+                m={0}
+                key={slot._id}
+                className="dashboard-menu-item"
+              >
+                <Flex
+                  key={slot._id}
+                  justifyContent="space-between"
+                  alignItems="center"
+                  w="full"
+                  p={4}
+                  borderWidth="1px"
+                  borderColor={color("gray.200", "gray.600")}
+                  borderRadius="md"
+                  mb={2}
+                  bg={color("white", "gray.700")}
+                  color={color("black", "white")}
+                >
                   <HStack>
-                    <Car className="text-2xl" color={color('black', 'white')} />
-                    <Text color={color('black', 'white')}>Parking Slot {slot.slotNumber}</Text>
+                    <Car className="text-2xl" color={color("black", "white")} />
+                    <Text color={color("black", "white")}>
+                      Parking Slot {slot.slotNumber}
+                    </Text>
                   </HStack>
                   <Button
                     onClick={() => handleReserveClick(slot)}
-                    leftIcon={slot.reserved ? <Unlock color={color('black', 'white')} /> : <Lock color={color('black', 'white')} />}
-                    colorScheme={slot.reserved ? (slot.userId === userId ? "red" : "gray") : "green"}
+                    leftIcon={
+                      slot.reservedBy ? (
+                        <Unlock color={color("black", "white")} />
+                      ) : (
+                        <Lock color={color("black", "white")} />
+                      )
+                    }
+                    colorScheme={
+                      slot.reservedBy &&
+                      !cancelDisabled &&
+                      slot.userId === userId
+                        ? "red"
+                        : "green"
+                    }
                     size="sm"
-                    isDisabled={slot.reserved && slot.userId !== userId}
+                    isDisabled={slot.reservedBy && slot.userId !== userId}
                   >
-                    {slot.reserved ? (slot.userId === userId ? "Cancel" : "Unavailable") : "Reserve"}
+                    {slot.reservedBy &&
+                    !cancelDisabled &&
+                    slot.userId === userId
+                      ? "Cancel"
+                      : "Reserve"}
                   </Button>
                   <Tag
                     size="sm"
                     colorScheme={
                       slot.currentDistance < slot.distanceThreshold
-                        ? (slot.reservationId && slot.reservedBy ? "red" : "yellow")
-                        : (slot.reservationId ? "orange" : "green")
+                        ? slot.reservationId && slot.reservedBy
+                          ? "red"
+                          : "yellow"
+                        : slot.reservationId
+                        ? "orange"
+                        : "green"
                     }
                     borderRadius="full"
                   >
                     <Circle
-                      className={`text-xs ${slot.currentDistance < slot.distanceThreshold ? "" : "fill-current"}`}
-                      color={color('black', 'white')}
+                      className={`text-xs ${
+                        slot.currentDistance < slot.distanceThreshold
+                          ? ""
+                          : "fill-current"
+                      }`}
+                      color={color("black", "white")}
                     />
                     {slot.currentDistance < slot.distanceThreshold
-                      ? (slot.reservationId && slot.reservedBy ? "Occupied" : "Unauthorized")
-                      : (slot.reservationId ? "Reserved" : "Available")
-                    }
+                      ? slot.reservationId && slot.reservedBy
+                        ? "Occupied"
+                        : "Unauthorized"
+                      : slot.reservationId
+                      ? "Reserved"
+                      : "Available"}
                   </Tag>
                 </Flex>
               </Container>
             ))}
-
           </aside>
         </div>
 
@@ -252,7 +345,12 @@ const handleSubmit = async () => {
                 <Button onClick={() => setIsReservationFormOpen(false)}>
                   Cancel
                 </Button>
-                <Button colorScheme="blue" onClick={handleSubmit} isLoading={isSubmitting} ml={3}>
+                <Button
+                  colorScheme="blue"
+                  onClick={handleSubmit}
+                  isLoading={isSubmitting}
+                  ml={3}
+                >
                   Reserve
                 </Button>
               </AlertDialogFooter>
@@ -272,14 +370,22 @@ const handleSubmit = async () => {
               </AlertDialogHeader>
 
               <AlertDialogBody>
-                Are you sure you want to cancel your reservation for slot {selectedSlot?.slotNumber}?
+                Are you sure you want to cancel your reservation for slot{" "}
+                {selectedSlot?.slotNumber}?
               </AlertDialogBody>
 
               <AlertDialogFooter>
-                <Button ref={cancelRef} onClick={() => setIsCancelConfirmOpen(false)}>
+                <Button
+                  ref={cancelRef}
+                  onClick={() => setIsCancelConfirmOpen(false)}
+                >
                   No
                 </Button>
-                <Button colorScheme="red" onClick={cancelReservation} ml={3}>
+                <Button
+                  colorScheme="red"
+                  onClick={cancelReservation}
+                  ml={3}
+                >
                   Yes, Cancel
                 </Button>
               </AlertDialogFooter>

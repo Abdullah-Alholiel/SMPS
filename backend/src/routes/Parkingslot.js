@@ -16,7 +16,7 @@ router.get('/initialize-parking-slots', async (req, res) => {
     }
 });
 
-
+// Route to get all parking slots
 router.get('/parkingSlots', parkingSlotController.getAllSlots);
 router.put('/parkingSlots/:slotNumber', parkingSlotController.updateSlotreservation);
 router.post('/api/parkingupdate', parkingSlotController.updaterealtimeSlots);

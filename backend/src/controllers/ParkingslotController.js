@@ -30,7 +30,7 @@ exports.getAllSlots = async (req, res) => {
 };
 // Function to update a parking slot
 exports.updateSlotreservation = async (req, res) => {
-    const { slotNumber, userId, status } = req.body;
+    const { slotNumber, userId, status, currentDistance } = req.body;
     try {
         // Find a parking slot based on the provided slot number
         const slot = await ParkingSlot.findOne({ slotNumber });
@@ -48,6 +48,14 @@ exports.updateSlotreservation = async (req, res) => {
         // Update the status and user ID of the parking slot
 //        slot.reservedBy = reservedBy ; // Update the reservation
         slot.status = status;
+
+        // Update isAvailable based on reservedBy
+        slot.isAvailable = slot.reservedBy ? 'no' : 'yes';
+
+        // If currentDistance is provided, update the slot with current distance
+        if (currentDistance !== undefined) {
+            slot.currentDistance = currentDistance;
+        }
         
         // Save the updated slot information to the database
         await slot.save();

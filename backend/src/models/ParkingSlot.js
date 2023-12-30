@@ -24,7 +24,10 @@ const parkingSlotSchema = new mongoose.Schema({
     ref: 'User', // Reference to the User model
     default: null
   },
-
+  reservedBy: {
+    type: String,
+    default: null
+  },
   lastUpdated: {
     type: Date,
     default: Date.now

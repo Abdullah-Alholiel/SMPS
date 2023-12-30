@@ -27,7 +27,7 @@ const Sidebar = ({ activePage, links }) => {
         throw new Error('No token found');
       }
   
-      await axios.post('http://localhost:3001/users/logout', {}, {
+      await axios.post('http://localhost:3001/api/users/logout', {}, {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${token}`
@@ -60,7 +60,7 @@ const Sidebar = ({ activePage, links }) => {
   
 
   return (
-    <Box width={sidebarWidth} bg={useColorModeValue('gray.100', 'gray.900')} p={1} transition="width 0.2s">
+<Box min-height="100vh" width={sidebarWidth} bg={useColorModeValue('gray.100', 'gray.900')} p={1} transition="width 0.2s">
       <IconButton
         icon={isOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
         onClick={onToggle}
