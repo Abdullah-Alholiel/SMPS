@@ -175,7 +175,6 @@ const reservations = await Reservation.find({})
 };
 
 // Function to show reservations for a specific user
-// Assuming Reservation model has a reference to User model as 'userId'
 exports.showUserReservations = async (req, res) => {
     try {
         const userId = req.params.userId;

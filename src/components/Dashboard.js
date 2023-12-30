@@ -25,6 +25,8 @@ import { Clock, MapPin, Car, Unlock, Lock } from "lucide-react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
+import Cookies from "universal-cookie";
+
 
 const SmartParkingDashboard = () => {
   // Hooks for managing state and side effects
@@ -65,35 +67,43 @@ const SmartParkingDashboard = () => {
   };
 
   // Function to handle reservation form submission
-  // Function to handle reservation form submission
-  const handleSubmit = async () => {
-    setIsSubmitting(true);
-    setCancelDisabled(true); // Disable the cancel button while the reservation is being created
+// Function to handle reservation form submission
+const handleSubmit = async () => {
+  setIsSubmitting(true);
+  setCancelDisabled(true); // Disable the cancel button while the reservation is being created
 
-    try {
-      const response = await axios.post(
-        "https://smps-shu.onrender.com/api/reservations/createreservation",
-        {
-          userId: localStorage.getItem("user_id"),
-          slotNumber: parseInt(reservation.slotId),
-          duration: parseInt(reservation.duration), // Include duration in the request
-        }
-      );
-
-      setMessage("Reservation created successfully");
-      setIsReservationFormOpen(false);
-      fetchParkingSlots(); // Refresh the slots after successful reservation
-    } catch (error) {
-      const errorMessage = error.response
-        ? error.response.data.error
-        : error.message;
-      setMessage(`Error: ${errorMessage}`);
-    } finally {
-      setIsSubmitting(false);
-      setCancelDisabled(false); // Enable the cancel button after the reservation is created or an error occurs
+  let userId;
+  try {
+    userId = localStorage.getItem('userId');
+    if (!userId) {
+      const cookies = new Cookies();
+      userId = cookies.get('userId');
+      if (!userId) {
+        throw new Error('User ID not found');
+      }
     }
-  };
+    const response = await axios.post(
+      "https://smps-shu.onrender.com/api/reservations/createreservation",
+      {
+        userId: userId,
+        slotNumber: parseInt(reservation.slotId),
+        duration: parseInt(reservation.duration), // Include duration in the request
+      }
+    );
 
+    setMessage("Reservation created successfully");
+    setIsReservationFormOpen(false);
+    fetchParkingSlots(); // Refresh the slots after successful reservation
+  } catch (error) {
+    const errorMessage = error.response
+      ? error.response.data.error
+      : error.message;
+    setMessage(`Error: ${errorMessage}`);
+  } finally {
+    setIsSubmitting(false);
+    setCancelDisabled(false); // Enable the cancel button after the reservation is created or an error occurs
+  }
+};
   // Function to fetch parking slots from the server
   const fetchParkingSlots = async () => {
     try {
