@@ -5,6 +5,7 @@ import HomePage from './Pages/HomePage';
 import Dashboard from './Pages/Dashboard';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
+import ResetPassword from './components/ResetPassword';
 import Cookies from "universal-cookie";
 
 const cookies = new Cookies();
@@ -27,6 +28,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/dashboard/*" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </BrowserRouter>

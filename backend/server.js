@@ -7,6 +7,8 @@ require('dotenv').config();
 const routes = require('./src/routes');
 const errorHandler = require('./src/middleware/errorHandler');
 const app = express();
+const bodyParser = require('body-parser');
+
 
 // CORS middleware and cookie parser
 const corsOptions = {
@@ -18,6 +20,7 @@ app.use(cors(corsOptions));
 
 app.use(cookieParser());
 app.use(express.json());
+app.use(bodyParser.json());
 
 
 
@@ -45,6 +48,12 @@ app.use((req, res, next) => {
   console.log(`Incoming request: ${req.method} ${req.path}`);
   next();
 });
+
+app.use((req, res, next) => {
+  console.log(JSON.stringify(req.body, null, 2));
+  next();
+});
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

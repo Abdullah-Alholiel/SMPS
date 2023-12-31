@@ -27,10 +27,12 @@ const Login = () => {
                 cookies.set('TOKEN', response.data.token, { path: '/' });
                 cookies.set('userId', response.data.user._id, { path: '/' });
                cookies.set('userRole', response.data.user.role, { path: '/' });
+               cookies.set('username' , response.data.user.username, { path: '/' });
                 // Store user ID in localStorage (choose one method)
                 localStorage.setItem('TOKEN', response.data.token);
                 localStorage.setItem('userId', response.data.user._id);
                 localStorage.setItem('userRole', response.data.role);
+                localStorage.setItem('username' , response.data.user.username);
                 if (response.data.user.role === 'admin') {
                     localStorage.setItem('userRole', response.data.user.role);
                 }

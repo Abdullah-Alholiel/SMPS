@@ -112,15 +112,16 @@ exports.handleOverstay = async (req, res) => {
             return res.status(404).send({ error: 'Reservation not found' });
         }
 
-        // Assume logic to determine overstay (could be based on reservation.endTime)
-        // For example, flagging an overstay if the current time is past the end time
         const hasOverstayed = new Date() > reservation.endTime;
         if (hasOverstayed) {
-            // Update reservation and parking slot accordingly
-            // Example: Marking the reservation as overstayed and notifying the user or admin
-            reservation.status = 'overstayed';
+            reservation.status = 'Overstay';
             await reservation.save();
-            // Additional logic for handling overstays (like notifications) can be added here
+
+            // Send notification to the user
+            await sendOverstayNotification(reservation.userId);
+
+            // Optionally, charge the user for the overstay
+            await chargeForOverstay(reservation.userId, calculateOverstayFee(reservation.endTime));
         }
 
         res.status(200).send({ message: 'Overstay handled', reservation });
@@ -128,6 +129,22 @@ exports.handleOverstay = async (req, res) => {
         res.status(500).send({ error: 'Error handling overstay' });
     }
 };
+
+// Function to send overstay notification
+async function sendOverstayNotification(userId) {
+    // Logic to send a notification to the user
+}
+
+// Function to calculate overstay fee
+function calculateOverstayFee(endTime) {
+    // Logic to calculate the fee based on the duration of the overstay
+    return fee;
+}
+
+// Function to charge for the overstay
+async function chargeForOverstay(userId, fee) {
+    // Logic to charge the user's account
+}
 
 // Handle unauthorized parking in a parking slot
 exports.handleUnauthorizedParking = async (req, res) => {

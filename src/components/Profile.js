@@ -5,7 +5,7 @@ import {
 } from '@chakra-ui/react';
 import axios from 'axios';
 import Cookies from 'universal-cookie';
-
+import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
   const toast = useToast();
@@ -57,6 +57,19 @@ const Profile = () => {
     }
   };
 
+  const navigate = useNavigate(); // Add this line
+// Handles password reset request
+  const handlePasswordResetRequest = async () => {
+    try {
+        const response = await axios.post('https://smps-shu.onrender.com/api/users/requestPasswordReset', { email: profileData.email });
+        toast({ title: response.data.message, status: 'success' });
+        navigate('/reset-password');
+    } catch (error) {
+        toast({ title: 'Failed to send password reset email', description: error.response.data.error, status: 'error' });
+    }
+};
+
+
   // Get the first name's initial for the avatar
   const getInitials = (name) => {
     return name ? name.split(' ')[0][0] : '';
@@ -87,6 +100,7 @@ const Profile = () => {
           </FormControl>
           <Button type="submit" colorScheme="blue" mt="4">Update Profile</Button>
         </form>
+        <Button onClick={handlePasswordResetRequest}>Forgot Password?</Button>
       </Box>
     </Container>
   );

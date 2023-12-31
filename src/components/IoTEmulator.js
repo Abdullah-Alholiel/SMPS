@@ -92,7 +92,8 @@ const IoTEmulator = () => {
             <SliderThumb />
           </Slider>
           <Box display="flex" alignItems="center">
-            <Text mr={2}>{slot.currentDistance} cm</Text>
+            <Text mr={2}>Distance from nearest object: {slot.currentDistance} cm</Text>
+            <Text mr={2}>Please press the button to update</Text>
             <IconButton
               icon={<EditIcon />}
               aria-label={`edit-distance-${index}`}

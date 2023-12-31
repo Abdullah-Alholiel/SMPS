@@ -27,7 +27,6 @@ import { useNavigate } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
 import Cookies from "universal-cookie";
 
-
 const SmartParkingDashboard = () => {
   // Hooks for managing state and side effects
   const toast = useToast();
@@ -38,7 +37,16 @@ const SmartParkingDashboard = () => {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [cancelDisabled, setCancelDisabled] = useState(false);
   const cancelRef = useRef();
-  const userId = localStorage.getItem("user_id"); // Retrieve the current user's ID from local storage
+  const cookies = new Cookies();
+  const userId = localStorage.getItem("userId") 
+  
+  if (!userId) {
+    const cookies = new Cookies();
+    userId = cookies.get("userId");
+    if (!userId) {
+      throw new Error("User ID not found");
+    }
+  }
 
   //reservation form state
   const [isReservationFormOpen, setIsReservationFormOpen] = useState(false);
@@ -67,47 +75,49 @@ const SmartParkingDashboard = () => {
   };
 
   // Function to handle reservation form submission
-// Function to handle reservation form submission
-const handleSubmit = async () => {
-  setIsSubmitting(true);
-  setCancelDisabled(true); // Disable the cancel button while the reservation is being created
+  // Function to handle reservation form submission
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    setCancelDisabled(true); // Disable the cancel button while the reservation is being created
 
-  let userId;
-  try {
-    userId = localStorage.getItem('userId');
-    if (!userId) {
-      const cookies = new Cookies();
-      userId = cookies.get('userId');
+    let userId;
+    try {
+      userId = localStorage.getItem("userId");
       if (!userId) {
-        throw new Error('User ID not found');
+        const cookies = new Cookies();
+        userId = cookies.get("userId");
+        if (!userId) {
+          throw new Error("User ID not found");
+        }
       }
-    }
-    const response = await axios.post(
-      "https://smps-shu.onrender.com/api/reservations/createreservation",
-      {
-        userId: userId,
-        slotNumber: parseInt(reservation.slotId),
-        duration: parseInt(reservation.duration), // Include duration in the request
-      }
-    );
+      const response = await axios.post(
+        "https://smps-shu.onrender.com/api/reservations/createreservation",
+        {
+          userId: userId,
+          slotNumber: parseInt(reservation.slotId),
+          duration: parseInt(reservation.duration), // Include duration in the request
+        }
+      );
 
-    setMessage("Reservation created successfully");
-    setIsReservationFormOpen(false);
-    fetchParkingSlots(); // Refresh the slots after successful reservation
-  } catch (error) {
-    const errorMessage = error.response
-      ? error.response.data.error
-      : error.message;
-    setMessage(`Error: ${errorMessage}`);
-  } finally {
-    setIsSubmitting(false);
-    setCancelDisabled(false); // Enable the cancel button after the reservation is created or an error occurs
-  }
-};
+      setMessage("Reservation created successfully");
+      setIsReservationFormOpen(false);
+      fetchParkingSlots(); // Refresh the slots after successful reservation
+    } catch (error) {
+      const errorMessage = error.response
+        ? error.response.data.error
+        : error.message;
+      setMessage(`Error: ${errorMessage}`);
+    } finally {
+      setIsSubmitting(false);
+      setCancelDisabled(false); // Enable the cancel button after the reservation is created or an error occurs
+    }
+  };
   // Function to fetch parking slots from the server
   const fetchParkingSlots = async () => {
     try {
-      const response = await axios.get("https://smps-shu.onrender.com/api/parkingSlots");
+      const response = await axios.get(
+        "https://smps-shu.onrender.com/api/parkingSlots"
+      );
       const updatedSlots = response.data.map((slot) => ({
         ...slot,
         reserved: slot.status === "reserved",
@@ -140,11 +150,14 @@ const handleSubmit = async () => {
   // Function to handle click on the Reserve/Cancel button
   const handleReserveClick = async (slot) => {
     if (slot.reserved && isSlotReservedByCurrentUser(slot)) {
-      // Prompt for cancellation if the slot is reserved by the current user
+      // Slot is reserved by the current user, show cancel option
       setSelectedSlot(slot);
       setIsCancelConfirmOpen(true);
-    } else if (slot.reserved) {
-      // Keep as unavailable if the slot is reserved by another user
+    } else if (!slot.reserved) {
+      // Slot is not reserved, show reserve option
+      openReservationForm(slot);
+    } else {
+      // Slot is reserved by another user, show unavailable
       toast({
         title: "Slot unavailable",
         description: "This parking slot is reserved by another user.",
@@ -152,14 +165,6 @@ const handleSubmit = async () => {
         duration: 3000,
         isClosable: true,
       });
-    } else {
-      // Navigate to the reservation form if the slot is not reserved
-      setReservation((prevState) => ({
-        ...prevState,
-        slotId: slot.slotNumber.toString(),
-      }));
-      setIsReservationFormOpen(true); // Open the reservation form
-      setCancelDisabled(false); // Enable the cancel button if the user opens the reservation form
     }
   };
 
@@ -211,12 +216,14 @@ const handleSubmit = async () => {
               bg={color("white", "gray.800")}
               color={color("black", "white")}
             >
-              <VStack alignItems="start">
-                <HStack>
-                  <Text fontWeight="bold" color={color("black", "white")}>
-                    Reservations
-                  </Text>
-                </HStack>
+              <VStack spacing={2} alignItems="start">
+                <Text fontWeight="bold" color={color("black", "white")}>
+                  Parking Slots Dashboard
+                </Text>
+                <Text color={color("black", "white")}>
+                  Please redirect to reservations if you couldn’t cancel from
+                  the dashboard.
+                </Text>
                 <HStack>
                   <Clock className="text-xl" color={color("black", "white")} />
                   <Text color={color("black", "white")}>
@@ -258,26 +265,26 @@ const handleSubmit = async () => {
                   <Button
                     onClick={() => handleReserveClick(slot)}
                     leftIcon={
-                      slot.reservedBy ? (
+                      slot.reserved ? (
                         <Unlock color={color("black", "white")} />
                       ) : (
                         <Lock color={color("black", "white")} />
                       )
                     }
                     colorScheme={
-                      slot.reservedBy &&
-                      !cancelDisabled &&
-                      slot.userId === userId
-                        ? "red"
+                      slot.reservedBy
+                        ? slot.userId === userId
+                          ? "red"
+                          : "gray"
                         : "green"
                     }
                     size="sm"
                     isDisabled={slot.reservedBy && slot.userId !== userId}
                   >
-                    {slot.reservedBy &&
-                    !cancelDisabled &&
-                    slot.userId === userId
-                      ? "Cancel"
+                    {slot.reservedBy
+                      ? slot.userId === userId
+                        ? "Cancel"
+                        : "Unavailable"
                       : "Reserve"}
                   </Button>
                   <Tag
@@ -391,11 +398,7 @@ const handleSubmit = async () => {
                 >
                   No
                 </Button>
-                <Button
-                  colorScheme="red"
-                  onClick={cancelReservation}
-                  ml={3}
-                >
+                <Button colorScheme="red" onClick={cancelReservation} ml={3}>
                   Yes, Cancel
                 </Button>
               </AlertDialogFooter>

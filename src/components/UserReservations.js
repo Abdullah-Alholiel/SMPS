@@ -14,6 +14,17 @@ import {
   HStack
 } from "@chakra-ui/react";
 import Cookies from 'universal-cookie';
+// At the beginning of your component function, retrieve the username
+const username = localStorage.getItem("username");
+if (!username) {
+  const cookies = new Cookies();
+  username = cookies.get("username");
+  if (!username) {
+    throw new Error("Username not found");
+  }
+}
+
+// Then, use the username variable in your JSX
 
 
 // Function to format dates for display
@@ -56,7 +67,8 @@ const ReservationCard = ({ reservation, onCancel }) => {
           </Badge>
         </Flex>
         <Text fontSize="sm" color="gray.500">ReservationID: {reservation._id}</Text>
-        <Text fontSize="sm" color="gray.500">Username: {reservation.userId.username}</Text>
+        <Text fontSize="sm" color="gray.500">Slot Number: {reservation.slotNumber}</Text>
+        <Text fontSize="sm" color="gray.500">Status: {reservation.reservationStatus}</Text>
         <Text fontSize="sm" color="gray.500">Start Time: {formatDate(reservation.startTime)}</Text>
         <Text fontSize="sm" color="gray.500">End Time: {formatDate(reservation.endTime)}</Text>
         {reservation.reservationStatus === 'active' && (
@@ -86,23 +98,29 @@ const ReservationsList = ({ userId, userRole, onCancel }) => {
       try {
         let response;
         const userId = localStorage.getItem("userId");
-        if (localStorage.getItem('userRole')  === 'admin') {
+        if (localStorage.getItem('userRole') === 'admin') {
           response = await axios.get("https://smps-shu.onrender.com/api/reservations");
         } else {
-          // Fetch reservations for the specific user when not an admin
           response = await axios.get(`https://smps-shu.onrender.com/api/reservations/${userId}`);
         }
         setReservations(response.data);
       } catch (err) {
         setError('Failed to fetch reservations');
         console.error(err); // Log the error for debugging
+        toast({
+          title: "Error fetching reservations",
+          description: err.message || 'Failed to fetch reservations',
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
       } finally {
         setLoading(false);
       }
     };
   
     fetchReservations();
-  }, [userId, userRole]); // Dependencies array
+  }, [userId, userRole, toast]); // Dependencies array
 
 
   // Pagination logic
@@ -197,7 +215,7 @@ const UserReservations = () => {
   }, [toast]);
 
   // Function to cancel a reservation
-  const cancelReservation = async (reservation, fetchReservations) => {
+  const cancelReservation = async (reservation) => {
     try {
       await axios.delete(`https://smps-shu.onrender.com/api/reservations/${reservation._id}`, {
         data: {
@@ -213,7 +231,7 @@ const UserReservations = () => {
         isClosable: true,
       });
       // Refresh the reservations list after cancellation
-      fetchReservations();
+      //fetchReservations();
     } catch (error) {
       toast({
         title: 'Error cancelling reservation',
@@ -230,7 +248,7 @@ const UserReservations = () => {
   return (
 <Container maxW="container.xl" p={{ base: 3, md: 5 }} centerContent>
   <Flex direction="column" align="center" justify="center" w="100%">
-    <Text fontSize={{ base: "xl", md: "2xl" }} mb={5}>Your Reservations</Text>
+    <Text fontSize={{ base: "xl", md: "2xl" }} mb={5}>Hey {username}, Here are Your Reservations</Text>
     <Box w="100%" px={{ base: 3, md: 5 }}>
       <ReservationsList userId={userId} onCancel={cancelReservation} />
     </Box>

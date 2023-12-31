@@ -8,6 +8,8 @@ router.post('/users/login', userController.login);
 router.post('/users/updateUser', userController.updateUser); // auth to be added
 // backend/src/routes/UserRoutes.js
 router.get('/profile/:userId', userController.getProfile);
+router.post('/users/requestPasswordReset', userController.requestPasswordReset);
+router.post('/users/resetPassword', userController.resetPassword);
 
 // Use auth middleware for routes that require authentication
 router.post('/users/logout', auth, userController.logout);
