@@ -7,21 +7,21 @@ require('dotenv').config();
 const routes = require('./src/routes');
 const errorHandler = require('./src/middleware/errorHandler');
 const app = express();
-const bodyParser = require('body-parser');
-
 
 // CORS middleware and cookie parser
-const corsOptions = {
-  origin: ['http://localhost:3000', 'http://localhost:3001'], // Add more origins as needed
-  credentials: true, // This is important for cookies/session information
-};
-
-app.use(cors(corsOptions));
-
+app.use(cors({
+  origin: function (origin, callback) {
+    const allowedOrigins = ['https://smps-shu.onrender.com', 'http://localhost:3000', 'http://localhost:10000'];
+    
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 app.use(cookieParser());
-app.use(express.json());
-app.use(bodyParser.json());
-
 
 
 
@@ -30,7 +30,9 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
   .then(() => console.log('Connected to DB'))
   .catch(err => console.error('Could not connect to DB', err));
 
-
+// Middleware
+app.use(cors()); // Adjust as per your CORS policy
+app.use(express.json());
 
 // API Routes
 app.use('/api', routes);
@@ -48,12 +50,6 @@ app.use((req, res, next) => {
   console.log(`Incoming request: ${req.method} ${req.path}`);
   next();
 });
-
-app.use((req, res, next) => {
-  console.log(JSON.stringify(req.body, null, 2));
-  next();
-});
-
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

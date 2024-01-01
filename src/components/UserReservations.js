@@ -15,14 +15,7 @@ import {
 } from "@chakra-ui/react";
 import Cookies from 'universal-cookie';
 // At the beginning of your component function, retrieve the username
-const username = localStorage.getItem("username");
-if (!username) {
-  const cookies = new Cookies();
-  username = cookies.get("username");
-  if (!username) {
-    throw new Error("Username not found");
-  }
-}
+
 
 // Then, use the username variable in your JSX
 
@@ -195,7 +188,14 @@ const UserReservations = () => {
   const [userId, setUserId] = useState('');
   const [userRole, setUserRole] = useState('');
   const toast = useToast();
-
+  const username = localStorage.getItem("username");
+  if (!username) {
+    const cookies = new Cookies();
+    username = cookies.get("username");
+    if (!username) {
+      throw new Error("Username not found");
+    }
+  }
   // Effect to retrieve user ID and role from storage
   useEffect(() => {
     const userId = localStorage.getItem("userId");
