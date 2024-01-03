@@ -44,8 +44,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "concurrently \"npm run start --prefix ./backend\" \"react-scripts start\"",
-    "build": "concurrently \"npm run build --prefix ./backend\" \"react-scripts build\"",
+    "start": "concurrently \"npm run start --prefix ./backend\" \"CI=false react-scripts start\"",
+    "build": "react-scripts build ",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "start:backend": "npm start --prefix backend",

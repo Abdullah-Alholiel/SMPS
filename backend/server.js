@@ -11,7 +11,7 @@ const app = express();
 // CORS middleware and cookie parser
 app.use(cors({
   origin: function (origin, callback) {
-    const allowedOrigins = ['https://smps-shu.onrender.com', '' ,'http://localhost:3000', 'http://localhost:3001'];
+    const allowedOrigins = ['https://smps-shu.onrender.com', 'spms-dissertation.azurewebsites.net' ,'http://localhost:3000', 'http://localhost:3001'];
     
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
