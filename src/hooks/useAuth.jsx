@@ -8,12 +8,11 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [message, setMessage] = useState("");
-  const navigate = useNavigate();
 
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
-
       navigate("/login");
       // Check if the user is already logged in
       try {

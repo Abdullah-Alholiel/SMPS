@@ -41,7 +41,6 @@ const SmartParkingDashboard = () => {
   const userId = localStorage.getItem("userId") 
   
   if (!userId) {
-    const cookies = new Cookies();
     userId = cookies.get("userId");
     if (!userId) {
       throw new Error("User ID not found");
@@ -187,6 +186,7 @@ const SmartParkingDashboard = () => {
         duration: 3000,
         isClosable: true,
       });
+      navigate("/dashboard/reservations");
       fetchParkingSlots(); // Refresh the slots after cancellation
     } catch (error) {
       toast({

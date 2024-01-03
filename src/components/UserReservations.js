@@ -83,7 +83,9 @@ const ReservationsList = ({ userId, userRole, onCancel }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [reservationsPerPage] = useState(3);
 
+
   const toast = useToast();
+
 
   // Effect to fetch reservations from the API
   useEffect(() => {
@@ -91,7 +93,8 @@ const ReservationsList = ({ userId, userRole, onCancel }) => {
       try {
         let response;
         const userId = localStorage.getItem("userId");
-        if (localStorage.getItem('userRole') === 'admin') {
+        const userRole = localStorage.getItem("userRole");
+        if (userRole === 'admin') {
           response = await axios.get("https://smps-shu.onrender.com/api/reservations");
         } else {
           response = await axios.get(`https://smps-shu.onrender.com/api/reservations/${userId}`);
@@ -196,10 +199,10 @@ const UserReservations = () => {
       throw new Error("Username not found");
     }
   }
+
   // Effect to retrieve user ID and role from storage
   useEffect(() => {
     const userId = localStorage.getItem("userId");
-    const userRole = localStorage.getItem("userRole");
     if (userId && userRole) {
       setUserId(userId);
       setUserRole(userRole);

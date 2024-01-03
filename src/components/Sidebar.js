@@ -42,14 +42,13 @@ const Sidebar = ({ activePage, links }) => {
       cookies.remove('userId');
       cookies.remove('userRole');
   
-      // Update auth state
-      if (auth && auth.setUser) {
+
 
       // Navigate to login or home page
 
 
         auth.setUser(null);
-      }
+
   
       navigate('/login');
     } catch (error) {

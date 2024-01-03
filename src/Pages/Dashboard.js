@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route, useNavigate, Outlet } from 'react-router-dom';
 import { Flex, Box, Heading } from '@chakra-ui/react';
-import { FaHome, FaUser, FaCar, FaCalendarAlt, FaMicrochip, FaSignOutAlt } from "react-icons/fa";
+import { FaHome, FaUser, FaCar, FaCalendarAlt, FaMicrochip } from "react-icons/fa";
 
 import Sidebar from '../components/Sidebar';
 import SmartParkingDashboard from '../components/Dashboard';
@@ -15,7 +15,7 @@ import useResponsive from '../hooks/useResponsive'; // Import useResponsive hook
 
 const DashboardLayout = () => {
   const navigate = useNavigate();
-  const auth = useAuth();
+  //const auth = useAuth();
   const { isDesktopOrLaptop } = useResponsive(); // Use the useResponsive hook
   const userRole = localStorage.getItem('userRole'); // Retrieve the user role from localStorage
 
