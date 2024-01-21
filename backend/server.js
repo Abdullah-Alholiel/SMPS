@@ -11,7 +11,7 @@ const app = express();
 // CORS middleware and cookie parser
 app.use(cors({
   origin: function (origin, callback) {
-    const allowedOrigins = ['https://smps-shu.onrender.com', 'spms-dissertation.azurewebsites.net' ,'http://localhost:3000', 'http://localhost:3001'];
+    const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001'];
     
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
@@ -31,7 +31,7 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
   .catch(err => console.error('Could not connect to DB', err));
 
 // Middleware
-app.use(cors()); // Adjust as per your CORS policy
+//app.use(cors()); // Adjust as per your CORS policy
 app.use(express.json());
 
 // API Routes

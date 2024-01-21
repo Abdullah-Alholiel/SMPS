@@ -6,7 +6,7 @@ import { FaHome, FaUser, FaCar, FaCalendarAlt, FaMicrochip } from "react-icons/f
 import Sidebar from '../components/Sidebar';
 import SmartParkingDashboard from '../components/Dashboard';
 import ParkingSlots from '../components/ParkingSlots';
-import UserReservations from '../components/UserReservations';
+import UserReservations from '../components/Reservations/UserReservations';
 import Profile from '../components/Profile';
 import IoTEmulator from '../components/IoTEmulator';
 import { useAuth } from '../hooks/useAuth';

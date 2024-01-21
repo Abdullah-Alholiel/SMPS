@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
-  Box, Text, Divider, Slider, SliderTrack, SliderFilledTrack, SliderThumb, IconButton, Image, useToast
+  Box, Text, Divider, Slider, SliderTrack, SliderFilledTrack, SliderThumb, IconButton, Image, useToast, Button
 } from '@chakra-ui/react';
 import { EditIcon } from '@chakra-ui/icons';
 
@@ -14,7 +14,7 @@ const IoTEmulator = () => {
   useEffect(() => {
     const fetchParkingSlots = async () => {
       try {
-        const response = await axios.get('https://smps-shu.onrender.com/api/parkingSlots');
+        const response = await axios.get('http://localhost:3001/api/parkingSlots');
         const updatedSlots = response.data.map(slot => ({
           ...slot,
           reserved: slot.status === 'reserved',
@@ -49,7 +49,7 @@ const IoTEmulator = () => {
   const handleUpdateDistance = async (index) => {
     try {
       const slot = parkingSlots[index];
-      await axios.put(`https://smps-shu.onrender.com/api/parkingSlots/${slot.slotNumber}`, {
+      await axios.put(`http://localhost:3001/api/parkingSlots/${slot.slotNumber}`, {
         slotNumber: slot.slotNumber,
         currentDistance: slot.currentDistance,
         status: slot.currentDistance < 150 ? 'occupied' : 'available',
@@ -102,7 +102,12 @@ const IoTEmulator = () => {
           </Box>
         </Box>
       ))}
+      <Box>
+      <Button mt={4} as="a" href="https://wokwi.com/projects/379416865624633345" target="_blank">
+        Link to Wokwi Simulation
+      </Button>
       <Image src="../IoTstructure.png" alt="IoT Component Structure" />
+      </Box>
     </Box>
   );
 };

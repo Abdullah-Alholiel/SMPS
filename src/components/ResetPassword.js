@@ -11,7 +11,7 @@ const ResetPassword = () => {
 
     const handleResetPassword = async () => {
         try {
-            await axios.post('https://smps-shu.onrender.com/api/users/resetPassword', { token, newPassword });
+            await axios.post('http://localhost:3001/api/users/resetPassword', { token, newPassword });
             toast({ title: 'Password reset successfully', status: 'success' });
             navigate('/login'); // Navigate to /login after success
         } catch (error) {

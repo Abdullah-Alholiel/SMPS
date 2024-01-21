@@ -19,8 +19,8 @@ const SignUp = () => {
 
   // Basic frontend validation
   const isValid = () => {
-    if (!userData.email.includes('@')) {
-      toast({ title: 'Invalid email', status: 'error', duration: 3000, isClosable: true });
+    if (!userData.username || !userData.email || !userData.phoneNumber || !userData.password || !userData.confirmPassword) {
+      toast({ title: 'All fields are required', status: 'error', duration: 3000, isClosable: true });
       return false;
     }
     if (userData.password !== userData.confirmPassword) {
@@ -37,10 +37,15 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!isValid()) return;
+
+    try {
     const cookies = new Cookies();
+    // Check if form is valid
+    isValid();
     if (!isValid()) return;
     try {
-      const response = await axios.post('https://smps-shu.onrender.com/api/users/register', userData);
+      const response = await axios.post('http://localhost:3001/api/users/register', userData);
       //save response in cookies
       cookies.set('User', response.data, { path: '/' });
       toast({ title: 'Registration successful', status: 'success', duration: 3000, isClosable: true });
@@ -48,7 +53,16 @@ const SignUp = () => {
     } catch (error) {
       toast({ title: 'Registration failed', description: error.response.data.message, status: 'error', duration: 3000, isClosable: true });
     }
-  };
+  }catch (error) {
+    let errorMessage = 'Registration failed';
+    if (error.response && error.response.data && error.response.data.message) {
+      errorMessage = error.response.data.message;
+    } else if (error.response && error.response.data && error.response.data.code === 11000) {
+      errorMessage = 'Username already exists';
+    }
+    toast({ title: errorMessage, status: 'error', duration: 3000, isClosable: true });
+  }
+};
 
   return (
     <Center py={8}>

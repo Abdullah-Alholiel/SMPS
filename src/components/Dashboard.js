@@ -38,13 +38,10 @@ const SmartParkingDashboard = () => {
   const [cancelDisabled, setCancelDisabled] = useState(false);
   const cancelRef = useRef();
   const cookies = new Cookies();
-  const userId = localStorage.getItem("userId") 
+  const userId = cookies.get("userId") 
   
   if (!userId) {
-    userId = cookies.get("userId");
-    if (!userId) {
       throw new Error("User ID not found");
-    }
   }
 
   //reservation form state
@@ -90,7 +87,7 @@ const SmartParkingDashboard = () => {
         }
       }
       const response = await axios.post(
-        "https://smps-shu.onrender.com/api/reservations/createreservation",
+        "http://localhost:3001/api/reservations/createreservation",
         {
           userId: userId,
           slotNumber: parseInt(reservation.slotId),
@@ -115,7 +112,7 @@ const SmartParkingDashboard = () => {
   const fetchParkingSlots = async () => {
     try {
       const response = await axios.get(
-        "https://smps-shu.onrender.com/api/parkingSlots"
+        "http://localhost:3001/api/parkingSlots"
       );
       const updatedSlots = response.data.map((slot) => ({
         ...slot,
@@ -171,7 +168,7 @@ const SmartParkingDashboard = () => {
   const cancelReservation = async () => {
     try {
       await axios.delete(
-        `https://smps-shu.onrender.com/api/reservations/${selectedSlot.reservationId}`,
+        `http://localhost:3001/api/reservations/${selectedSlot.reservationId}`,
         {
           data: {
             userId: userId,

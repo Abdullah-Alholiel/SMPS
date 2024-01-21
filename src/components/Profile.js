@@ -6,6 +6,8 @@ import {
 import axios from 'axios';
 import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
+import usePasswordReset from '../hooks/usePasswordReset'; 
+
 
 const Profile = () => {
   const toast = useToast();
@@ -20,7 +22,8 @@ const Profile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        let userId = localStorage.getItem('user._id');
+        const cookies = new Cookies();
+        let userId = cookies.get('user._id');
         if (!userId) {
           const cookies = new Cookies();
           userId = cookies.get('userId');
@@ -28,7 +31,7 @@ const Profile = () => {
             throw new Error('User ID not found');
           }
         }
-        const response = await axios.get(`https://smps-shu.onrender.com/api/profile/${userId}`, {
+        const response = await axios.get(`http://localhost:3001/api/profile/${userId}`, {
           withCredentials: true
         });
         setProfileData(response.data); // Set profile data in state
@@ -47,8 +50,9 @@ const Profile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token'); // Fetch token from local storage
-      await axios.post('https://smps-shu.onrender.com/api/users/updateUser', profileData, {
+      const cookies = new Cookies();
+      const token = cookies.get('token'); // Fetch token from local storage
+      await axios.post('http://localhost:3001/api/users/updateUser', profileData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast({ title: 'User profile updated', status: 'success', duration: 3000, isClosable: true });
@@ -58,16 +62,8 @@ const Profile = () => {
   };
 
   const navigate = useNavigate(); // Add this line
-// Handles password reset request
-  const handlePasswordResetRequest = async () => {
-    try {
-        const response = await axios.post('https://smps-shu.onrender.com/api/users/requestPasswordReset', { email: profileData.email });
-        toast({ title: response.data.message, status: 'success' });
-        navigate('/reset-password');
-    } catch (error) {
-        toast({ title: 'Failed to send password reset email', description: error.response.data.error, status: 'error' });
-    }
-};
+  const handleForgotPassword = usePasswordReset(); // Use the custom hook
+
 
 
   // Get the first name's initial for the avatar
@@ -100,7 +96,7 @@ const Profile = () => {
           </FormControl>
           <Button type="submit" colorScheme="blue" mt="4">Update Profile</Button>
         </form>
-        <Button onClick={handlePasswordResetRequest}>Forgot Password?</Button>
+        <Button onClick={() => handleForgotPassword(profileData.email)}>Forgot Password?</Button>
       </Box>
     </Container>
   );

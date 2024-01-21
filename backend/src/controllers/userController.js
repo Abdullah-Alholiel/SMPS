@@ -2,20 +2,25 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { hashPassword } = require("../middleware/auth");
+const {generateAuthToken}= require("../models/User.js");
 const cookies = require("universal-cookie");
 const nodemailer = require("nodemailer");
 
 // Register a new user
 exports.register = async (req, res) => {
   try {
-    const user = new User(req.body);
-    await user.save();
-    const token = await user.generateAuthToken();
-    res
-      .status(201)
-      .send({ message: "User registered successfully", user, token });
+      const user = new User(req.body);
+      await user.save();
+      const token = await user.generateAuthToken();
+      res.status(201).send({ message: "User registered successfully", user, token });
   } catch (error) {
-    res.status(400).send(error);
+      if (error.code === 11000) {
+          // Handle duplicate key error
+          res.status(400).send({ error: "Username or email already exists" });
+      } else {
+          // Handle other errors
+          res.status(400).send({ error: error.message });
+      }
   }
 };
 
@@ -184,7 +189,8 @@ exports.requestPasswordReset = async (req, res) => {
       }
     });
     res.send({ message: "Password reset email sent" });
-  } catch (error) {
+  } catch (err) {
+    console.error("Error sending email: ", err);
     res.status(500).send({ error: "Error sending password reset email" });
   }
 };

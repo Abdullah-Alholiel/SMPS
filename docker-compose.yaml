@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  frontend:
+    image: spmsdiss.azurecr.io/frontend:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:3000" # Azure Web App listens on port 80 or 443 by default
+    restart: always
+
+  backend:
+    image: spmsdiss.azurecr.io/backend:latest
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    restart: always
+
+volumes:
+  build-volume:
