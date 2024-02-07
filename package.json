@@ -28,7 +28,7 @@
     "jsonwebtoken": "^9.0.2",
     "local-storage": "^2.0.0",
     "localStorage": "^1.0.4",
-    "lucide-react": "^0.294.0",
+    "lucide-react": "^0.312.0",
     "mongoose": "^8.0.1",
     "next": "^13.4.3",
     "nodemailer": "^6.9.8",
